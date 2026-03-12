@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Transfer Money - MoneyBox{% endblock %}
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6 max-w-2xl mx-auto">
+    <h2 class="text-2xl font-semibold mb-6">Transfer Between Wallets</h2>
+    <form method="post">
+        {{ form.hidden_tag() }}
+        <div class="mb-4">
+            {{ form.from_wallet.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+            <select name="from_wallet" id="from_wallet" class="border rounded-lg px-3 py-2 w-full">
+                <option value="">Select source wallet</option>
+                {% for value, label in form.from_wallet.choices %}
+                <option value="{{ value }}" {% if form.from_wallet.data == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            {% for error in form.from_wallet.errors %}<p class="text-red-600 text-sm mt-1">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="mb-4">
+            {{ form.to_wallet.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+            <select name="to_wallet" id="to_wallet" class="border rounded-lg px-3 py-2 w-full">
+                <option value="">Select destination wallet</option>
+                {% for value, label in form.to_wallet.choices %}
+                <option value="{{ value }}" {% if form.to_wallet.data == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            {% for error in form.to_wallet.errors %}<p class="text-red-600 text-sm mt-1">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="mb-4">
+            {{ form.amount.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+            {{ form.amount(class="border rounded-lg px-3 py-2 w-full") }}
+        </div>
+        <div class="mb-4">
+            {{ form.date.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+            {{ form.date(class="border rounded-lg px-3 py-2 w-full", type="date") }}
+        </div>
+        <div class="mb-4">
+            {{ form.description.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+            {{ form.description(class="border rounded-lg px-3 py-2 w-full") }}
+        </div>
+        <div class="flex justify-end space-x-3">
+            <a href="{{ url_for('wallets.list_wallets') }}" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</a>
+            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Transfer</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

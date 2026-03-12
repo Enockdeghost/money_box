@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px; }
+        .reminder { background-color: #fef9c3; color: #854d0e; padding: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Bill Reminder</h2>
+        <div class="reminder">
+            <p>Your bill <strong>{{ bill.name }}</strong> of <strong>${{ "%.2f"|format(bill.amount) }}</strong> is due soon.</p>
+            <p>Due date: {{ bill.next_due.strftime('%Y-%m-%d') }}</p>
+        </div>
+        <p><a href="{{ url_for('bills.list_bills', _external=True) }}" class="button">View Bills</a></p>
+    </div>
+</body>
+</html>

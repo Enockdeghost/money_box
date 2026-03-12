@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Categories - MoneyBox{% endblock %}
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-semibold">Categories</h2>
+        <a href="{{ url_for('categories.create_category') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+            <i class="fas fa-plus mr-2"></i>New Category
+        </a>
+    </div>
+
+    <div x-data="{ activeTab: 'expense' }">
+        <!-- Tabs -->
+        <div class="border-b border-gray-200 mb-6">
+            <nav class="-mb-px flex space-x-8">
+                <button @click="activeTab = 'expense'" :class="{ 'border-indigo-500 text-indigo-600': activeTab === 'expense', 'border-transparent text-gray-500 hover:text-gray-700': activeTab !== 'expense' }" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                    Expense Categories
+                </button>
+                <button @click="activeTab = 'income'" :class="{ 'border-indigo-500 text-indigo-600': activeTab === 'income', 'border-transparent text-gray-500 hover:text-gray-700': activeTab !== 'income' }" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                    Income Categories
+                </button>
+            </nav>
+        </div>
+
+        <!-- Expense Categories -->
+        <div x-show="activeTab === 'expense'">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for cat in expense_cats %}
+                <div class="border rounded-lg p-4 flex items-center justify-between" style="border-left: 5px solid {{ cat.color }};">
+                    <div class="flex items-center">
+                        <i class="fas fa-{{ cat.icon }} text-2xl mr-3" style="color: {{ cat.color }};"></i>
+                        <div>
+                            <p class="font-medium">{{ cat.name }}</p>
+                            {% if cat.parent %}<p class="text-xs text-gray-500">{{ cat.parent.name }}</p>{% endif %}
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <a href="{{ url_for('categories.edit_category', category_id=cat.id) }}" class="text-indigo-600 hover:text-indigo-900"><i class="fas fa-edit"></i></a>
+                        {% if not cat.is_system %}
+                        <form action="{{ url_for('categories.delete_category', category_id=cat.id) }}" method="post" class="inline" onsubmit="return confirm('Delete this category?');">
+                            <button type="submit" class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+                {% else %}
+                <p class="col-span-3 text-gray-500">No expense categories. Create one!</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Income Categories -->
+        <div x-show="activeTab === 'income'">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {% for cat in income_cats %}
+                <div class="border rounded-lg p-4 flex items-center justify-between" style="border-left: 5px solid {{ cat.color }};">
+                    <div class="flex items-center">
+                        <i class="fas fa-{{ cat.icon }} text-2xl mr-3" style="color: {{ cat.color }};"></i>
+                        <p class="font-medium">{{ cat.name }}</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <a href="{{ url_for('categories.edit_category', category_id=cat.id) }}" class="text-indigo-600 hover:text-indigo-900"><i class="fas fa-edit"></i></a>
+                        {% if not cat.is_system %}
+                        <form action="{{ url_for('categories.delete_category', category_id=cat.id) }}" method="post" class="inline" onsubmit="return confirm('Delete this category?');">
+                            <button type="submit" class="text-red-600 hover:text-red-900"><i class="fas fa-trash"></i></button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+                {% else %}
+                <p class="col-span-3 text-gray-500">No income categories. Create one!</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Savings Goals - MoneyBox{% endblock %}
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-semibold">Savings Goals</h2>
+        <a href="{{ url_for('savings.create_goal') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+            <i class="fas fa-plus mr-2"></i>New Goal
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for goal in goals %}
+        <div class="border rounded-lg p-4 hover:shadow-md transition" style="border-left: 5px solid {{ goal.color }};">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="font-semibold text-lg flex items-center">
+                        <i class="fas fa-{{ goal.icon }} mr-2" style="color: {{ goal.color }};"></i>
+                        {{ goal.name }}
+                    </h3>
+                    <p class="text-sm text-gray-500">Deadline: {{ goal.deadline.strftime('%Y-%m-%d') if goal.deadline else 'No deadline' }}</p>
+                </div>
+                <p class="text-lg font-bold">${{ "%.2f"|format(goal.target_amount) }}</p>
+            </div>
+            <div class="mt-3">
+                <div class="flex justify-between text-sm mb-1">
+                    <span>Saved: ${{ "%.2f"|format(goal.current_amount) }}</span>
+                    <span>{{ (goal.current_amount / goal.target_amount * 100)|round|int }}%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div class="h-2.5 rounded-full bg-green-600" style="width: {{ (goal.current_amount / goal.target_amount * 100)|round }}%"></div>
+                </div>
+            </div>
+            <div class="mt-4 flex space-x-2">
+                <a href="{{ url_for('savings.contribute', goal_id=goal.id) }}" class="text-sm text-indigo-600 hover:underline">Add contribution</a>
+                <a href="{{ url_for('savings.edit_goal', goal_id=goal.id) }}" class="text-sm text-gray-600 hover:underline">Edit</a>
+                <form action="{{ url_for('savings.delete_goal', goal_id=goal.id) }}" method="post" class="inline" onsubmit="return confirm('Delete this goal?');">
+                    <button type="submit" class="text-sm text-red-600 hover:underline">Delete</button>
+                </form>
+                {% if goal.current_amount >= goal.target_amount and not goal.is_completed %}
+                <form action="{{ url_for('savings.complete_goal', goal_id=goal.id) }}" method="post" class="inline">
+                    <button type="submit" class="text-sm text-green-600 hover:underline">Mark complete</button>
+                </form>
+                {% endif %}
+            </div>
+            {% if goal.is_completed %}
+            <p class="mt-2 text-xs text-green-600"><i class="fas fa-check-circle"></i> Completed on {{ goal.completed_date.strftime('%Y-%m-%d') }}</p>
+            {% endif %}
+        </div>
+        {% else %}
+        <p class="col-span-3 text-gray-500">No savings goals yet. Start saving!</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

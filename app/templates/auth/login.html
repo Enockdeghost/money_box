@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - MoneyBox</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-indigo-600">MoneyBox</h1>
+                <p class="text-gray-600">Welcome back!</p>
+            </div>
+            <form method="post">
+                {{ form.hidden_tag() }}
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                    {{ form.email(class="border rounded-lg w-full px-3 py-2", placeholder="your@email.com") }}
+                    {% for error in form.email.errors %}<p class="text-red-600 text-sm mt-1">{{ error }}</p>{% endfor %}
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                    {{ form.password(class="border rounded-lg w-full px-3 py-2", placeholder="********") }}
+                    {% for error in form.password.errors %}<p class="text-red-600 text-sm mt-1">{{ error }}</p>{% endfor %}
+                </div>
+                <div class="mb-6 flex items-center">
+                    {{ form.remember(class="form-checkbox text-indigo-600 mr-2") }}
+                    <span class="text-sm text-gray-700">{{ form.remember.label }}</span>
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition">
+                    <i class="fas fa-sign-in-alt mr-2"></i>Log In
+                </button>
+            </form>
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-600">Don't have an account? <a href="{{ url_for('auth.register') }}" class="text-indigo-600 hover:underline">Sign up</a></p>
+                <p class="text-sm mt-2"><a href="{{ url_for('auth.reset_request') }}" class="text-indigo-600 hover:underline">Forgot password?</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

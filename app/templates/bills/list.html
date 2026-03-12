@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Bills & Subscriptions - MoneyBox{% endblock %}
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-semibold">Bills & Subscriptions</h2>
+        <a href="{{ url_for('bills.create_bill') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+            <i class="fas fa-plus mr-2"></i>New Bill
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for bill in bills %}
+        <div class="border rounded-lg p-4 hover:shadow-md transition">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="font-semibold text-lg">{{ bill.name }}</h3>
+                    <p class="text-sm text-gray-500">{{ bill.frequency|capitalize }} • Due day {{ bill.due_day }}{% if bill.due_month %}/{{ bill.due_month }}{% endif %}</p>
+                </div>
+                <p class="text-lg font-bold text-red-600">${{ "%.2f"|format(bill.amount) }}</p>
+            </div>
+            <div class="mt-2 text-sm">
+                {% if bill.next_due %}
+                <p class="flex items-center">
+                    <i class="fas fa-calendar-alt mr-2 text-gray-400"></i>Next due: {{ bill.next_due.strftime('%Y-%m-%d') }}
+                    {% if (bill.next_due - today).days <= bill.reminder_days %}
+                    <span class="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Soon</span>
+                    {% endif %}
+                </p>
+                {% endif %}
+                {% if bill.category %}
+                <p class="text-gray-500 mt-1"><span class="inline-block w-2 h-2 rounded-full mr-1" style="background-color: {{ bill.category.color }};"></span>{{ bill.category.name }}</p>
+                {% endif %}
+            </div>
+            <div class="mt-4 flex space-x-2">
+                <form action="{{ url_for('bills.pay_bill', bill_id=bill.id) }}" method="post" class="inline">
+                    <button type="submit" class="text-sm bg-green-100 text-green-700 px-3 py-1 rounded hover:bg-green-200">Pay</button>
+                </form>
+                <a href="{{ url_for('bills.edit_bill', bill_id=bill.id) }}" class="text-sm text-indigo-600 hover:underline">Edit</a>
+                <form action="{{ url_for('bills.delete_bill', bill_id=bill.id) }}" method="post" class="inline" onsubmit="return confirm('Delete this bill?');">
+                    <button type="submit" class="text-sm text-red-600 hover:underline">Delete</button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <p class="col-span-3 text-gray-500">No bills yet. Add your recurring payments!</p>
+        {% endfor %}
+    </div>
+
+    <!-- Calendar link -->
+    <div class="mt-8 text-center">
+        <a href="{{ url_for('bills.calendar') }}" class="text-indigo-600 hover:underline">
+            <i class="fas fa-calendar-alt mr-2"></i>View calendar
+        </a>
+    </div>
+</div>
+{% endblock %}

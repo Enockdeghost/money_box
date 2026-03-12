@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if transaction else 'Add' }} Transaction - MoneyBox{% endblock %}
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6 max-w-2xl mx-auto">
+    <h2 class="text-2xl font-semibold mb-6">{{ 'Edit' if transaction else 'Add' }} Transaction</h2>
+    <form method="post" enctype="multipart/form-data" x-data="{ type: '{{ form.type.data or 'expense' }}' }">
+        {{ form.hidden_tag() }}
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Type</label>
+            <div class="flex space-x-4">
+                <label class="inline-flex items-center">
+                    <input type="radio" name="type" value="expense" x-model="type" class="form-radio text-indigo-600" {% if form.type.data == 'expense' or not form.type.data %}checked{% endif %}>
+                    <span class="ml-2">Expense</span>
+                </label>
+                <label class="inline-flex items-center">
+                    <input type="radio" name="type" value="income" x-model="type" class="form-radio text-indigo-600" {% if form.type.data == 'income' %}checked{% endif %}>
+                    <span class="ml-2">Income</span>
+                </label>
+            </div>
+            {% for error in form.type.errors %}<p class="text-red-600 text-sm mt-1">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div class="mb-4">
+            {{ form.amount.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+            {{ form.amount(class="border rounded-lg px-3 py-2 w-full") }}
+            {% for error in form.amount.errors %}<p class="text-red-600 text-sm mt-1">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div class="mb-4">
+            {{ form.category_id.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+            <select name="category_id" id="category_id" class="border rounded-lg px-3 py-2 w-full">
+                <option value="">Select category</option>
+                {% for value, label in form.category_id.choices %}
+                <option value="{{ value }}" {% if form.category_id.data == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            {% for error in form.category_id.errors %}<p class="text-red-600 text-sm mt-1">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div class="mb-4">
+            {{ form.wallet_id.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+            <select name="wallet_id" id="wallet_id" class="border rounded-lg px-3 py-2 w-full">
+                <option value="">Select wallet</option>
+                {% for value, label in form.wallet_id.choices %}
+                <option value="{{ value }}" {% if form.wallet_id.data == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            {% for error in form.wallet_id.errors %}<p class="text-red-600 text-sm mt-1">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div class="mb-4">
+            {{ form.date.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+            {{ form.date(class="border rounded-lg px-3 py-2 w-full", type="date") }}
+            {% for error in form.date.errors %}<p class="text-red-600 text-sm mt-1">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div class="mb-4">
+            {{ form.description.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+            {{ form.description(class="border rounded-lg px-3 py-2 w-full") }}
+        </div>
+
+        <div class="mb-4">
+            {{ form.notes.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+            {{ form.notes(class="border rounded-lg px-3 py-2 w-full", rows=3) }}
+        </div>
+
+        <div class="mb-4">
+            {{ form.merchant.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+            {{ form.merchant(class="border rounded-lg px-3 py-2 w-full") }}
+        </div>
+
+        <div class="mb-4">
+            {{ form.tags.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+            {{ form.tags(class="border rounded-lg px-3 py-2 w-full") }}
+        </div>
+
+        <div class="mb-4">
+            {{ form.receipt.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+            {{ form.receipt(class="border rounded-lg px-3 py-2 w-full") }}
+        </div>
+
+        <div x-show="type == 'expense'" class="mb-4">
+            {{ form.transfer_to.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+            <select name="transfer_to" id="transfer_to" class="border rounded-lg px-3 py-2 w-full">
+                <option value="0">None (not a transfer)</option>
+                {% for value, label in form.transfer_to.choices %}
+                    {% if value != 0 %}
+                    <option value="{{ value }}" {% if form.transfer_to.data == value %}selected{% endif %}>{{ label }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-4">
+            <label class="inline-flex items-center">
+                {{ form.is_recurring(class="form-checkbox text-indigo-600") }}
+                <span class="ml-2 text-sm text-gray-700">{{ form.is_recurring.label }}</span>
+            </label>
+        </div>
+
+        <div class="flex justify-end space-x-3">
+            <a href="{{ url_for('transactions.list_transactions') }}" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</a>
+            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Save</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

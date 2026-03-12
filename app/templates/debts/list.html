@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Debts & Loans - MoneyBox{% endblock %}
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6">
+    <h2 class="text-2xl font-semibold mb-6">Debts & Loans</h2>
+
+    <div x-data="{ activeTab: 'debts' }">
+        <!-- Tabs -->
+        <div class="border-b border-gray-200 mb-6">
+            <nav class="-mb-px flex space-x-8">
+                <button @click="activeTab = 'debts'" :class="{ 'border-indigo-500 text-indigo-600': activeTab === 'debts', 'border-transparent text-gray-500 hover:text-gray-700': activeTab !== 'debts' }" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                    Debts (I owe)
+                </button>
+                <button @click="activeTab = 'loans'" :class="{ 'border-indigo-500 text-indigo-600': activeTab === 'loans', 'border-transparent text-gray-500 hover:text-gray-700': activeTab !== 'loans' }" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                    Loans (Owed to me)
+                </button>
+            </nav>
+        </div>
+
+        <!-- Debts -->
+        <div x-show="activeTab === 'debts'">
+            <div class="mb-4">
+                <a href="{{ url_for('debts.create_debt') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                    <i class="fas fa-plus mr-2"></i>Add Debt
+                </a>
+            </div>
+            <div class="space-y-4">
+                {% for debt in debts %}
+                <div class="border rounded-lg p-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-semibold text-lg">{{ debt.name }}</h3>
+                            <p class="text-sm text-gray-500">Lender: {{ debt.lender }}</p>
+                        </div>
+                        <p class="text-xl font-bold text-red-600">${{ "%.2f"|format(debt.remaining_amount) }} / ${{ "%.2f"|format(debt.total_amount) }}</p>
+                    </div>
+                    <div class="mt-2">
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div class="h-2.5 rounded-full bg-red-600" style="width: {{ (debt.remaining_amount / debt.total_amount * 100)|round }}%"></div>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex space-x-2">
+                        <a href="{{ url_for('debts.repay_debt', debt_id=debt.id) }}" class="text-sm bg-green-100 text-green-700 px-3 py-1 rounded hover:bg-green-200">Repay</a>
+                        <a href="#" class="text-sm text-indigo-600 hover:underline">Details</a>
+                    </div>
+                </div>
+                {% else %}
+                <p class="text-gray-500">No debts recorded.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Loans -->
+        <div x-show="activeTab === 'loans'">
+            <div class="mb-4">
+                <a href="{{ url_for('debts.create_loan') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                    <i class="fas fa-plus mr-2"></i>Add Loan
+                </a>
+            </div>
+            <div class="space-y-4">
+                {% for loan in loans %}
+                <div class="border rounded-lg p-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-semibold text-lg">{{ loan.name }}</h3>
+                            <p class="text-sm text-gray-500">Borrower: {{ loan.borrower }}</p>
+                        </div>
+                        <p class="text-xl font-bold text-green-600">${{ "%.2f"|format(loan.remaining_amount) }} / ${{ "%.2f"|format(loan.total_amount) }}</p>
+                    </div>
+                    <div class="mt-2">
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div class="h-2.5 rounded-full bg-green-600" style="width: {{ (loan.remaining_amount / loan.total_amount * 100)|round }}%"></div>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex space-x-2">
+                        <a href="{{ url_for('debts.receive_repayment', loan_id=loan.id) }}" class="text-sm bg-green-100 text-green-700 px-3 py-1 rounded hover:bg-green-200">Receive repayment</a>
+                        <a href="#" class="text-sm text-indigo-600 hover:underline">Details</a>
+                    </div>
+                </div>
+                {% else %}
+                <p class="text-gray-500">No loans recorded.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

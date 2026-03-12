@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Export Data - MoneyBox{% endblock %}
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6 max-w-2xl mx-auto">
+    <h2 class="text-2xl font-semibold mb-6">Export Your Data</h2>
+    <form method="get" action="{{ url_for('sync.export_data') }}">
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Data Type</label>
+            <select name="data_type" class="border rounded-lg px-3 py-2 w-full">
+                <option value="all">All Data</option>
+                <option value="transactions">Transactions Only</option>
+                <option value="budgets">Budgets</option>
+                <option value="savings">Savings Goals</option>
+            </select>
+        </div>
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Format</label>
+            <select name="format" class="border rounded-lg px-3 py-2 w-full">
+                <option value="csv">CSV</option>
+                <option value="excel">Excel</option>
+                <option value="json">JSON</option>
+            </select>
+        </div>
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Start Date (optional)</label>
+                <input type="date" name="start_date" class="border rounded-lg px-3 py-2 w-full">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">End Date (optional)</label>
+                <input type="date" name="end_date" class="border rounded-lg px-3 py-2 w-full">
+            </div>
+        </div>
+        <div class="flex justify-end">
+            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                <i class="fas fa-download mr-2"></i>Download Export
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

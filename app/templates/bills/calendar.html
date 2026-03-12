@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Bills Calendar - MoneyBox{% endblock %}
+{% block head %}
+<!-- FullCalendar CSS -->
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+{% endblock %}
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6">
+    <h2 class="text-2xl font-semibold mb-6">Bills Calendar</h2>
+    <div id="calendar"></div>
+</div>
+
+<!-- FullCalendar JS -->
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek'
+            },
+            events: {{ events|safe }},
+            eventClick: function(info) {
+                alert('Bill: ' + info.event.title);
+            }
+        });
+        calendar.render();
+    });
+</script>
+{% endblock %}

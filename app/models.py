@@ -1,0 +1,301 @@
+from app.extensions import db, login_manager
+from flask_login import UserMixin
+from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(128))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_active = db.Column(db.Boolean, default=True)
+    email_verified = db.Column(db.Boolean, default=False)
+    email_verification_token = db.Column(db.String(100))
+    two_factor_enabled = db.Column(db.Boolean, default=False)
+    two_factor_secret = db.Column(db.String(32))
+    passcode = db.Column(db.String(128))
+    biometric_enabled = db.Column(db.Boolean, default=False)
+
+    # Relationships
+    preferences = db.relationship('UserPreference', uselist=False, backref='user', cascade='all, delete-orphan')
+    devices = db.relationship('UserDevice', backref='user', lazy='dynamic', cascade='all, delete-orphan')
+    wallets = db.relationship('Wallet', backref='user', lazy='dynamic', cascade='all, delete-orphan')
+    categories = db.relationship('Category', backref='user', lazy='dynamic', cascade='all, delete-orphan')
+    transactions = db.relationship('Transaction', backref='user', lazy='dynamic', cascade='all, delete-orphan')
+    budgets = db.relationship('Budget', backref='user', lazy='dynamic', cascade='all, delete-orphan')
+    savings_goals = db.relationship('SavingsGoal', backref='user', lazy='dynamic', cascade='all, delete-orphan')
+    bills = db.relationship('Bill', backref='user', lazy='dynamic', cascade='all, delete-orphan')
+    debts = db.relationship('Debt', backref='user', lazy='dynamic', cascade='all, delete-orphan')
+    loans = db.relationship('Loan', backref='user', lazy='dynamic', cascade='all, delete-orphan')
+    recurring_transactions = db.relationship('RecurringTransaction', backref='user', lazy='dynamic', cascade='all, delete-orphan')
+    shared_wallets = db.relationship('SharedWallet', foreign_keys='SharedWallet.user_id', backref='owner_user', lazy='dynamic')
+    shared_with_me = db.relationship('SharedWallet', foreign_keys='SharedWallet.shared_with_user_id', backref='shared_user', lazy='dynamic')
+    backup_tokens = db.relationship('BackupToken', backref='user', lazy='dynamic', cascade='all, delete-orphan')
+    login_history = db.relationship('LoginHistory', backref='user', lazy='dynamic', cascade='all, delete-orphan')
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+    def set_passcode(self, passcode):
+        self.passcode = generate_password_hash(passcode)
+
+    def check_passcode(self, passcode):
+        return check_password_hash(self.passcode, passcode)
+
+class UserPreference(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    language = db.Column(db.String(10), default='en')
+    theme = db.Column(db.String(10), default='light')
+    currency = db.Column(db.String(3), default='USD')
+    date_format = db.Column(db.String(20), default='YYYY-MM-DD')
+    first_day_of_week = db.Column(db.Integer, default=0)
+    notification_enabled = db.Column(db.Boolean, default=True)
+    email_notifications = db.Column(db.Boolean, default=True)
+    push_notifications = db.Column(db.Boolean, default=False)
+    budget_alert_threshold = db.Column(db.Integer, default=80)
+    backup_frequency = db.Column(db.String(20), default='weekly')
+    auto_backup_enabled = db.Column(db.Boolean, default=False)
+    encryption_enabled = db.Column(db.Boolean, default=False)
+
+class UserDevice(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    device_name = db.Column(db.String(100))
+    device_type = db.Column(db.String(20))
+    last_login = db.Column(db.DateTime, default=datetime.utcnow)
+    ip_address = db.Column(db.String(45))
+    user_agent = db.Column(db.String(200))
+    is_current = db.Column(db.Boolean, default=False)
+    refresh_token = db.Column(db.String(200))
+
+class LoginHistory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    login_time = db.Column(db.DateTime, default=datetime.utcnow)
+    ip_address = db.Column(db.String(45))
+    user_agent = db.Column(db.String(200))
+    success = db.Column(db.Boolean, default=True)
+
+class BackupToken(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    token = db.Column(db.String(100), unique=True)
+    used = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Wallet(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), nullable=False)
+    type = db.Column(db.String(20))
+    balance = db.Column(db.Numeric(12,2), default=0)
+    currency = db.Column(db.String(3), default='USD')
+    icon = db.Column(db.String(50), default='wallet')
+    color = db.Column(db.String(7), default='#007bff')
+    is_hidden = db.Column(db.Boolean, default=False)
+    is_shared = db.Column(db.Boolean, default=False)
+    notes = db.Column(db.Text)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    bank_account_id = db.Column(db.String(100))
+    bank_last_sync = db.Column(db.DateTime)
+    transactions = db.relationship('Transaction', foreign_keys='Transaction.wallet_id', backref='wallet', lazy='dynamic')
+    transfer_from = db.relationship('Transaction', foreign_keys='Transaction.transfer_target_wallet_id', backref='target_wallet', lazy='dynamic')
+    shared_with = db.relationship('SharedWallet', backref='wallet', lazy='dynamic', cascade='all, delete-orphan')
+
+class SharedWallet(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    wallet_id = db.Column(db.Integer, db.ForeignKey('wallet.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    shared_with_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    permission = db.Column(db.String(20), default='view')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Category(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), nullable=False)
+    type = db.Column(db.String(10))
+    icon = db.Column(db.String(50), default='circle')
+    color = db.Column(db.String(7), default='#6c757d')
+    is_system = db.Column(db.Boolean, default=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    parent_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+    subcategories = db.relationship('Category', backref=db.backref('parent', remote_side=[id]))
+    transactions = db.relationship('Transaction', backref='category', lazy='dynamic')
+    budgets = db.relationship('Budget', backref='category', lazy='dynamic')
+
+class Transaction(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    amount = db.Column(db.Numeric(12,2), nullable=False)
+    type = db.Column(db.String(10))
+    description = db.Column(db.String(200))
+    notes = db.Column(db.Text)
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+    merchant = db.Column(db.String(100))
+    location = db.Column(db.String(100))
+    receipt_filename = db.Column(db.String(200))
+    is_recurring = db.Column(db.Boolean, default=False)
+    recurring_id = db.Column(db.Integer, db.ForeignKey('recurring_transaction.id'))
+    wallet_id = db.Column(db.Integer, db.ForeignKey('wallet.id'), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    transfer_target_wallet_id = db.Column(db.Integer, db.ForeignKey('wallet.id'))
+    transfer_transaction_id = db.Column(db.Integer)
+    tags = db.Column(db.String(200))
+    external_id = db.Column(db.String(100))
+    source = db.Column(db.String(20))
+    goal_id = db.Column(db.Integer, db.ForeignKey('savings_goal.id'))
+    recurring = db.relationship('RecurringTransaction', backref='transactions')
+
+class RecurringTransaction(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    frequency = db.Column(db.String(20))
+    interval = db.Column(db.Integer, default=1)
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date)
+    next_date = db.Column(db.Date)
+    amount = db.Column(db.Numeric(12,2), nullable=False)
+    type = db.Column(db.String(10))
+    description = db.Column(db.String(200))
+    notes = db.Column(db.Text)
+    wallet_id = db.Column(db.Integer, db.ForeignKey('wallet.id'), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_bill = db.Column(db.Boolean, default=False)
+    bill_reminder_days = db.Column(db.Integer, default=0)
+
+class Budget(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    amount = db.Column(db.Numeric(12,2), nullable=False)
+    period = db.Column(db.String(10))
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    rollover = db.Column(db.Boolean, default=False)
+    alert_threshold = db.Column(db.Integer, default=80)
+    last_alert_sent = db.Column(db.DateTime)
+
+class SavingsGoal(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    target_amount = db.Column(db.Numeric(12,2), nullable=False)
+    current_amount = db.Column(db.Numeric(12,2), default=0)
+    start_date = db.Column(db.Date, default=datetime.utcnow().date)
+    deadline = db.Column(db.Date)
+    notes = db.Column(db.Text)
+    icon = db.Column(db.String(50), default='bullseye')
+    color = db.Column(db.String(7), default='#28a745')
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    is_completed = db.Column(db.Boolean, default=False)
+    completed_date = db.Column(db.Date)
+    auto_save_amount = db.Column(db.Numeric(12,2))
+
+class Bill(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    amount = db.Column(db.Numeric(12,2), nullable=False)
+    due_day = db.Column(db.Integer)
+    due_month = db.Column(db.Integer)
+    frequency = db.Column(db.String(20))
+    start_date = db.Column(db.Date)
+    end_date = db.Column(db.Date)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+    wallet_id = db.Column(db.Integer, db.ForeignKey('wallet.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    reminder_days = db.Column(db.Integer, default=3)
+    is_active = db.Column(db.Boolean, default=True)
+    notes = db.Column(db.Text)
+    last_paid = db.Column(db.Date)
+    next_due = db.Column(db.Date)
+
+class Debt(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    total_amount = db.Column(db.Numeric(12,2), nullable=False)
+    remaining_amount = db.Column(db.Numeric(12,2), nullable=False)
+    interest_rate = db.Column(db.Numeric(5,2))
+    start_date = db.Column(db.Date, nullable=False)
+    due_date = db.Column(db.Date)
+    lender = db.Column(db.String(100))
+    notes = db.Column(db.Text)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    is_paid = db.Column(db.Boolean, default=False)
+    repayments = db.relationship('Repayment', backref='debt', lazy='dynamic')
+
+class Loan(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    total_amount = db.Column(db.Numeric(12,2), nullable=False)
+    remaining_amount = db.Column(db.Numeric(12,2), nullable=False)
+    interest_rate = db.Column(db.Numeric(5,2))
+    start_date = db.Column(db.Date, nullable=False)
+    due_date = db.Column(db.Date)
+    borrower = db.Column(db.String(100))
+    notes = db.Column(db.Text)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    is_repaid = db.Column(db.Boolean, default=False)
+    repayments = db.relationship('Repayment', backref='loan', lazy='dynamic')
+
+class Repayment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    amount = db.Column(db.Numeric(12,2), nullable=False)
+    date = db.Column(db.Date, default=datetime.utcnow().date)
+    notes = db.Column(db.Text)
+    debt_id = db.Column(db.Integer, db.ForeignKey('debt.id'))
+    loan_id = db.Column(db.Integer, db.ForeignKey('loan.id'))
+    transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'))
+
+class ExchangeRate(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    base_currency = db.Column(db.String(3), nullable=False)
+    target_currency = db.Column(db.String(3), nullable=False)
+    rate = db.Column(db.Numeric(12,6), nullable=False)
+    date = db.Column(db.Date, default=datetime.utcnow().date)
+
+class Backup(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    filename = db.Column(db.String(200))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    size = db.Column(db.Integer)
+    type = db.Column(db.String(20))
+    status = db.Column(db.String(20))
+
+class SyncStatus(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    last_sync = db.Column(db.DateTime)
+    device_id = db.Column(db.Integer, db.ForeignKey('user_device.id'))
+    changes_pending = db.Column(db.Boolean, default=False)
+
+class FinancialInsight(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    insight_type = db.Column(db.String(50))
+    title = db.Column(db.String(200))
+    description = db.Column(db.Text)
+    data = db.Column(db.JSON)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_read = db.Column(db.Boolean, default=False)
+
+class FraudAlert(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'))
+    alert_type = db.Column(db.String(50))
+    message = db.Column(db.String(200))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_resolved = db.Column(db.Boolean, default=False)

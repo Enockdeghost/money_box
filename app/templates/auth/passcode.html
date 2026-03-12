@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passcode - MoneyBox</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+            <div class="text-center mb-8">
+                <i class="fas fa-lock text-indigo-600 text-5xl mb-4"></i>
+                <h2 class="text-2xl font-bold">Enter Passcode</h2>
+            </div>
+            <form method="post">
+                {{ form.hidden_tag() }}
+                <div class="mb-6">
+                    <input type="password" name="passcode" class="border rounded-lg w-full px-3 py-3 text-center text-2xl tracking-widest" placeholder="****" maxlength="4" pattern="\d*" inputmode="numeric">
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700">Unlock</button>
+            </form>
+            <p class="mt-4 text-center"><a href="{{ url_for('auth.logout') }}" class="text-sm text-indigo-600 hover:underline">Log out</a></p>
+        </div>
+    </div>
+</body>
+</html>

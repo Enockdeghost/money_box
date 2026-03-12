@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Receive Loan Repayment - MoneyBox{% endblock %}
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6 max-w-2xl mx-auto">
+    <h2 class="text-2xl font-semibold mb-6">Receive Repayment for "{{ loan.name }}"</h2>
+    <p class="mb-4">Remaining amount: <span class="font-bold">${{ "%.2f"|format(loan.remaining_amount) }}</span></p>
+    <form method="post">
+        {{ form.hidden_tag() }}
+        <div class="mb-4">
+            {{ form.amount.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+            {{ form.amount(class="border rounded-lg px-3 py-2 w-full") }}
+        </div>
+        <div class="mb-4">
+            {{ form.date.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+            {{ form.date(class="border rounded-lg px-3 py-2 w-full", type="date") }}
+        </div>
+        <div class="mb-4">
+            {{ form.wallet_id.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+            <select name="wallet_id" class="border rounded-lg px-3 py-2 w-full">
+                <option value="">Select wallet</option>
+                {% for value, label in form.wallet_id.choices %}
+                <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-4">
+            {{ form.notes.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+            {{ form.notes(class="border rounded-lg px-3 py-2 w-full", rows=3) }}
+        </div>
+        <div class="flex justify-end space-x-3">
+            <a href="{{ url_for('debts.list_debts') }}" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</a>
+            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Record Repayment</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

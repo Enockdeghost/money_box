@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Notification Settings - MoneyBox{% endblock %}
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6 max-w-2xl mx-auto">
+    <h2 class="text-2xl font-semibold mb-6">Notification Settings</h2>
+    <form method="post">
+        {{ form.hidden_tag() }}
+        <div class="mb-4">
+            <label class="inline-flex items-center">
+                {{ form.email_notifications(class="form-checkbox text-indigo-600") }}
+                <span class="ml-2 text-sm text-gray-700">{{ form.email_notifications.label }}</span>
+            </label>
+        </div>
+        <div class="mb-4">
+            <label class="inline-flex items-center">
+                {{ form.push_notifications(class="form-checkbox text-indigo-600") }}
+                <span class="ml-2 text-sm text-gray-700">{{ form.push_notifications.label }}</span>
+            </label>
+        </div>
+        <div class="mb-4">
+            {{ form.budget_alert_threshold.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+            {{ form.budget_alert_threshold(class="border rounded-lg px-3 py-2 w-full") }}
+        </div>
+        <div class="mb-4">
+            {{ form.bill_reminder_days.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+            {{ form.bill_reminder_days(class="border rounded-lg px-3 py-2 w-full") }}
+        </div>
+        <div class="flex justify-end">
+            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Save Preferences</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

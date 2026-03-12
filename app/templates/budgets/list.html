@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Budgets - MoneyBox{% endblock %}
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-semibold">Budgets</h2>
+        <a href="{{ url_for('budgets.create_budget') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+            <i class="fas fa-plus mr-2"></i>New Budget
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for item in budget_data %}
+        <div class="border rounded-lg p-4 hover:shadow-md transition">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="font-semibold text-lg">{{ item.budget.name }}</h3>
+                    <p class="text-sm text-gray-500">{{ item.budget.period|capitalize }} • {{ item.budget.category.name }}</p>
+                </div>
+                <p class="text-lg font-bold">${{ "%.2f"|format(item.budget.amount) }}</p>
+            </div>
+            <div class="mt-3">
+                <div class="flex justify-between text-sm mb-1">
+                    <span>Spent: ${{ "%.2f"|format(item.spent) }}</span>
+                    <span>Remaining: ${{ "%.2f"|format(item.remaining) }}</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div class="h-2.5 rounded-full {% if item.progress >= 100 %}bg-red-600{% else %}bg-indigo-600{% endif %}" style="width: {{ item.progress }}%"></div>
+                </div>
+            </div>
+            <div class="mt-4 flex space-x-2">
+                <a href="{{ url_for('budgets.budget_details', budget_id=item.budget.id) }}" class="text-sm text-indigo-600 hover:underline">Details</a>
+                <a href="{{ url_for('budgets.edit_budget', budget_id=item.budget.id) }}" class="text-sm text-gray-600 hover:underline">Edit</a>
+                <form action="{{ url_for('budgets.delete_budget', budget_id=item.budget.id) }}" method="post" class="inline" onsubmit="return confirm('Delete this budget?');">
+                    <button type="submit" class="text-sm text-red-600 hover:underline">Delete</button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <p class="col-span-3 text-gray-500">No budgets yet. Create your first budget!</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

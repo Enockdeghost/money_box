@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 5px; }
+        .alert { background-color: #fee2e2; color: #b91c1c; padding: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Budget Alert</h2>
+        <div class="alert">
+            <p>Your budget <strong>{{ budget.name }}</strong> has reached <strong>${{ "%.2f"|format(spent) }}</strong> out of <strong>${{ "%.2f"|format(budget.amount) }}</strong>.</p>
+            <p>That's {{ "%.0f"|format((spent/budget.amount)*100) }}% of your budget.</p>
+        </div>
+        <p><a href="{{ url_for('budgets.list_budgets', _external=True) }}" class="button">View Budgets</a></p>
+    </div>
+</body>
+</html>

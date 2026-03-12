@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Share Wallet - MoneyBox{% endblock %}
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6 max-w-md mx-auto">
+    <h2 class="text-2xl font-semibold mb-6">Share "{{ wallet.name }}"</h2>
+    <form method="post">
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Email of user</label>
+            <input type="email" name="email" required class="border rounded-lg px-3 py-2 w-full">
+        </div>
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Permission</label>
+            <select name="permission" class="border rounded-lg px-3 py-2 w-full">
+                <option value="view">View only</option>
+                <option value="edit">Edit</option>
+            </select>
+        </div>
+        <div class="flex justify-end space-x-3">
+            <a href="{{ url_for('wallets.list_wallets') }}" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</a>
+            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Share</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

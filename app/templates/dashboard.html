@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - MoneyBox{% endblock %}
+{% block content %}
+<div class="space-y-6">
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-indigo-100 text-indigo-600 mr-4">
+                    <i class="fas fa-chart-line text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Net Worth</p>
+                    <p class="text-2xl font-semibold">${{ "%.2f"|format(net_worth) }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                    <i class="fas fa-arrow-up text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Income this month</p>
+                    <p class="text-2xl font-semibold">${{ "%.2f"|format(total_income) }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-red-100 text-red-600 mr-4">
+                    <i class="fas fa-arrow-down text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Expenses this month</p>
+                    <p class="text-2xl font-semibold">${{ "%.2f"|format(total_expense) }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-yellow-100 text-yellow-600 mr-4">
+                    <i class="fas fa-piggy-bank text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Savings Rate</p>
+                    <p class="text-2xl font-semibold">{{ "%.0f"|format((total_income - total_expense)/total_income*100 if total_income > 0 else 0) }}%</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold mb-4">Income vs Expense</h3>
+            <canvas id="incomeExpenseChart" height="200"></canvas>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold mb-4">Spending by Category</h3>
+            <canvas id="categoryPieChart" height="200"></canvas>
+        </div>
+    </div>
+
+    <!-- Recent Transactions and Budgets -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold mb-4">Recent Transactions</h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% for t in recent_transactions %}
+                        <tr>
+                            <td class="px-4 py-2 text-sm">{{ t.date.strftime('%Y-%m-%d') }}</td>
+                            <td class="px-4 py-2 text-sm">{{ t.description or '-' }}</td>
+                            <td class="px-4 py-2 text-sm">
+                                <span class="px-2 py-1 rounded-full text-xs" style="background-color: {{ t.category.color }}20; color: {{ t.category.color }};">
+                                    {{ t.category.name }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-2 text-sm font-medium {% if t.type == 'income' %}text-green-600{% else %}text-red-600{% endif %}">
+                                {{ '+' if t.type == 'income' else '-' }}${{ "%.2f"|format(t.amount) }}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="4" class="px-4 py-2 text-sm text-gray-500 text-center">No transactions yet</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-4 text-right">
+                <a href="{{ url_for('transactions.list_transactions') }}" class="text-sm text-indigo-600 hover:underline">View all</a>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold mb-4">Budget Progress</h3>
+            <div class="space-y-4">
+                {% for item in budget_data %}
+                <div>
+                    <div class="flex justify-between text-sm mb-1">
+                        <span>{{ item.budget.name }}</span>
+                        <span class="font-medium">${{ "%.2f"|format(item.spent) }} / ${{ "%.2f"|format(item.budget.amount) }}</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div class="h-2.5 rounded-full {% if item.progress >= 100 %}bg-red-600{% else %}bg-indigo-600{% endif %}" style="width: {{ item.progress }}%"></div>
+                    </div>
+                </div>
+                {% else %}
+                <p class="text-sm text-gray-500">No active budgets.</p>
+                {% endfor %}
+            </div>
+            <div class="mt-4 text-right">
+                <a href="{{ url_for('budgets.list_budgets') }}" class="text-sm text-indigo-600 hover:underline">Manage budgets</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Bills -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold mb-4">Upcoming Bills</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {% for bill in upcoming_bills %}
+            <div class="border rounded-lg p-4 flex justify-between items-center">
+                <div>
+                    <p class="font-medium">{{ bill.name }}</p>
+                    <p class="text-sm text-gray-500">Due {{ bill.next_due.strftime('%Y-%m-%d') }}</p>
+                </div>
+                <p class="font-bold text-red-600">${{ "%.2f"|format(bill.amount) }}</p>
+            </div>
+            {% else %}
+            <p class="text-sm text-gray-500">No upcoming bills.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // Flag to ensure charts are created only once
+        if (window.moneyboxChartsInitialized) {
+            console.warn('Charts already initialized, skipping');
+            return;
+        }
+        window.moneyboxChartsInitialized = true;
+
+        console.log('Initializing charts...');
+
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM ready, creating charts...');
+
+            // Safely parse Flask data with fallbacks
+            let months = [], incomeTrend = [], expenseTrend = [];
+            let catLabels = [], catData = [], catColors = [];
+
+            try {
+                months = {{ months | tojson | safe }} || [];
+                incomeTrend = {{ income_trend | tojson | safe }} || [];
+                expenseTrend = {{ expense_trend | tojson | safe }} || [];
+                catLabels = {{ cat_labels | tojson | safe }} || [];
+                catData = {{ cat_data | tojson | safe }} || [];
+                catColors = {{ cat_colors | tojson | safe }} || [];
+            } catch (e) {
+                console.error('Error parsing data from Flask:', e);
+            }
+
+            console.log('months:', months);
+            console.log('incomeTrend:', incomeTrend);
+            console.log('expenseTrend:', expenseTrend);
+            console.log('catLabels:', catLabels);
+            console.log('catData:', catData);
+            console.log('catColors:', catColors);
+
+            // Income vs Expense Chart
+            const canvas1 = document.getElementById('incomeExpenseChart');
+            if (!canvas1) {
+                console.error('Canvas element #incomeExpenseChart not found');
+            } else {
+                // Destroy existing chart if any (safety)
+                if (window.incomeExpenseChart) window.incomeExpenseChart.destroy();
+                try {
+                    window.incomeExpenseChart = new Chart(canvas1.getContext('2d'), {
+                        type: 'line',
+                        data: {
+                            labels: months,
+                            datasets: [
+                                { label: 'Income', data: incomeTrend, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', tension: 0.4 },
+                                { label: 'Expense', data: expenseTrend, borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.1)', tension: 0.4 }
+                            ]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+                    console.log('Income/Expense chart created');
+                } catch (e) {
+                    console.error('Error creating income/expense chart:', e);
+                }
+            }
+
+            // Category Pie Chart
+            const canvas2 = document.getElementById('categoryPieChart');
+            if (!canvas2) {
+                console.error('Canvas element #categoryPieChart not found');
+            } else {
+                if (window.categoryPieChart) window.categoryPieChart.destroy();
+                try {
+                    window.categoryPieChart = new Chart(canvas2.getContext('2d'), {
+                        type: 'pie',
+                        data: {
+                            labels: catLabels,
+                            datasets: [{ data: catData, backgroundColor: catColors }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+                    console.log('Pie chart created');
+                } catch (e) {
+                    console.error('Error creating pie chart:', e);
+                }
+            }
+        });
+    })();
+</script>
+{% endblock %}

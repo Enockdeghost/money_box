@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Devices - MoneyBox{% endblock %}
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6">
+    <h2 class="text-2xl font-semibold mb-6">Connected Devices</h2>
+    <div class="space-y-4">
+        {% for device in devices %}
+        <div class="flex items-center justify-between border-b pb-2">
+            <div>
+                <p class="font-medium">{{ device.device_name }}</p>
+                <p class="text-sm text-gray-500">Last login: {{ device.last_login.strftime('%Y-%m-%d %H:%M') }}</p>
+            </div>
+            <div class="flex items-center space-x-2">
+                {% if device.is_current %}
+                <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Current device</span>
+                {% else %}
+                <form action="{{ url_for('settings.revoke_device', device_id=device.id) }}" method="post" class="inline">
+                    <button type="submit" class="text-sm text-red-600 hover:underline">Revoke</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="mt-6">
+        <form action="{{ url_for('settings.logout_all') }}" method="post" onsubmit="return confirm('Log out from all other devices?');">
+            <button type="submit" class="text-sm text-indigo-600 hover:underline">Log out from all other devices</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
