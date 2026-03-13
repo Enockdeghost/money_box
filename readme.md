@@ -204,21 +204,8 @@ Follow these steps to get MoneyBox running on your local machine for development
     pip install -r requirements.txt
     ```
 
-4.  **Set up environment variables**
-    Create a `.env` file in the project root and add the following (adjust as needed):
-    ```env
-    SECRET_KEY=your-super-secret-key-change-this-in-production
-    DATABASE_URL=sqlite:///moneybox.db
-    # For email features (use a real SMTP server in production)
-    MAIL_SERVER=smtp.gmail.com
-    MAIL_PORT=587
-    MAIL_USE_TLS=true
-    MAIL_USERNAME=your-email@gmail.com
-    MAIL_PASSWORD=your-app-password
-    MAIL_DEFAULT_SENDER=your-email@gmail.com
-    # For background tasks
-    REDIS_URL=redis://localhost:6379/0
-    ```
+
+  
 
 5.  **Initialize the database**
     ```bash
@@ -273,15 +260,7 @@ This section is a condensed version of the detailed user guide. It covers the es
 *   **Set a Passcode**: In the same `Security` section, set a 4-digit passcode for quicker access on trusted devices.
 *   **Review Devices (`Settings` → `Devices`)**: Check for any unfamiliar devices and revoke access.
 
-## 🤝 Contributing
 
-We welcome contributions! If you'd like to help improve MoneyBox, please follow these guidelines:
-
-1.  Fork the repository.
-2.  Create a new branch for your feature or bug fix: `git checkout -b feature/your-feature-name`.
-3.  Make your changes, ensuring code quality and adding tests if applicable.
-4.  Commit your changes with clear, descriptive messages.
-5.  Push to your fork and submit a pull request to the `main` branch.
 
 Please report any bugs or suggest features by opening an issue on GitHub.
 
