@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Edit Shared Budget - MoneyBox{% endblock %}
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6 max-w-2xl mx-auto">
+    <h2 class="text-2xl font-semibold mb-6">Edit Shared Budget: {{ budget.name }}</h2>
+    <form method="post">
+        {{ form.hidden_tag() }}
+        <div class="mb-4">
+            {{ form.name.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+            {{ form.name(class="border rounded-lg px-3 py-2 w-full") }}
+        </div>
+        <div class="mb-4">
+            {{ form.amount.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+            {{ form.amount(class="border rounded-lg px-3 py-2 w-full") }}
+        </div>
+        <div class="mb-4">
+            {{ form.period.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+            {{ form.period(class="border rounded-lg px-3 py-2 w-full") }}
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div class="mb-4">
+                {{ form.start_date.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+                {{ form.start_date(class="border rounded-lg px-3 py-2 w-full", type="date") }}
+            </div>
+            <div class="mb-4">
+                {{ form.end_date.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+                {{ form.end_date(class="border rounded-lg px-3 py-2 w-full", type="date") }}
+            </div>
+        </div>
+        <div class="mb-4">
+            {{ form.category_id.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+            <select name="category_id" class="border rounded-lg px-3 py-2 w-full">
+                {% for value, label in form.category_id.choices %}
+                <option value="{{ value }}" {% if form.category_id.data == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-4">
+            {{ form.shared_with_email.label(class="block text-sm font-medium text-gray-700 mb-2") }}
+            {{ form.shared_with_email(class="border rounded-lg px-3 py-2 w-full") }}
+        </div>
+        <div class="flex justify-end space-x-3">
+            <a href="{{ url_for('shared_budgets.list_shared_budgets') }}" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</a>
+            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Update</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -21,6 +21,8 @@ class User(UserMixin, db.Model):
     passcode = db.Column(db.String(128))
     biometric_enabled = db.Column(db.Boolean, default=False)
 
+    health_score = db.Column(db.Integer, default=0)
+    health_score_updated_at = db.Column(db.DateTime)
     # Relationships
     preferences = db.relationship('UserPreference', uselist=False, backref='user', cascade='all, delete-orphan')
     devices = db.relationship('UserDevice', backref='user', lazy='dynamic', cascade='all, delete-orphan')
@@ -201,6 +203,9 @@ class SavingsGoal(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     is_completed = db.Column(db.Boolean, default=False)
     completed_date = db.Column(db.Date)
+    round_up_enabled = db.Column(db.Boolean, default=False)
+    round_up_wallet_id = db.Column(db.Integer, db.ForeignKey('wallet.id'))
+    round_up_wallet = db.relationship('Wallet', foreign_keys=[round_up_wallet_id])
     auto_save_amount = db.Column(db.Numeric(12,2))
 
 class Bill(db.Model):
@@ -299,3 +304,42 @@ class FraudAlert(db.Model):
     message = db.Column(db.String(200))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_resolved = db.Column(db.Boolean, default=False)
+
+class Subscription(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    amount = db.Column(db.Numeric(12,2), nullable=False)
+    billing_cycle = db.Column(db.String(20))  # 'monthly', 'yearly', 'weekly'
+    next_billing_date = db.Column(db.Date)
+    active = db.Column(db.Boolean, default=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+    wallet_id = db.Column(db.Integer, db.ForeignKey('wallet.id'))
+    reminder_days = db.Column(db.Integer, default=3)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
+
+class Achievement(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    name = db.Column(db.String(100))
+    description = db.Column(db.String(200))
+    earned_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+class SharedBudget(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    amount = db.Column(db.Numeric(12,2), nullable=False)
+    period = db.Column(db.String(10))  # monthly, yearly
+    start_date = db.Column(db.Date)
+    end_date = db.Column(db.Date)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    shared_with_user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
+
+    owner = db.relationship('User', foreign_keys=[owner_id])
+    shared_with = db.relationship('User', foreign_keys=[shared_with_user_id])
+    category = db.relationship('Category')

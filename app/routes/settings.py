@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
+from flask import Blueprint, jsonify, render_template, redirect, url_for, flash, request, abort
 from flask_login import login_required, current_user, logout_user
 from app.extensions import db
 from app.models import UserPreference, UserDevice
@@ -111,3 +111,16 @@ def delete_account():
     db.session.commit()
     flash('Account deleted. Sorry to see you go.', 'info')
     return redirect(url_for('main.index'))
+
+@bp.route('/theme', methods=['POST'])
+@login_required
+def set_theme():
+    data = request.get_json()
+    theme = data.get('theme')
+    if theme in ['light', 'dark']:
+        if not current_user.preferences:
+            current_user.preferences = UserPreference(user_id=current_user.id)
+        current_user.preferences.theme = theme
+        db.session.commit()
+        return jsonify({'status': 'ok'})
+    return jsonify({'error': 'Invalid theme'}), 400

@@ -33,6 +33,7 @@ def verify_reset_token(token, expiration=3600):
     except:
         return None
 
+
 def send_verification_email(user):
     token = user.email_verification_token
     if not token:
@@ -48,8 +49,14 @@ def send_reset_email(user):
     token = generate_reset_token(user)
     link = url_for('auth.reset_token', token=token, _external=True)
     msg = Message('Password Reset Request', recipients=[user.email])
-    msg.body = f'Click the link to reset your password: {link}'
-    msg.html = f'<p>Click <a href="{link}">here</a> to reset your password.</p>'
+    msg.body = f'''To reset your password, visit the following link:
+{link}
+
+If you did not make this request, simply ignore this email.
+'''
+    msg.html = f'''<p>To reset your password, click the link below:</p>
+<p><a href="{link}">Reset Password</a></p>
+<p>If you did not make this request, ignore this email.</p>'''
     mail.send(msg)
 
 # Two-factor authentication helpers

@@ -29,3 +29,14 @@ def send_bill_reminder(user, bill):
     """Send bill reminder email."""
     send_email(user.email, f'Reminder: {bill.name} is due soon', 'bill_reminder',
                user=user, bill=bill)
+
+def send_subscription_reminder(user, subscription):
+    msg = Message(
+        f'Upcoming Subscription: {subscription.name}',
+        recipients=[user.email]
+    )
+    msg.body = f'''Your subscription {subscription.name} of ${subscription.amount} is due on {subscription.next_billing_date}.
+
+You can manage your subscriptions here: {url_for('subscriptions.list_subscriptions', _external=True)}
+'''
+    mail.send(msg)

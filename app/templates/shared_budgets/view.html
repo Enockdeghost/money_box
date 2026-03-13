@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}{{ budget.name }} - Shared Budget - MoneyBox{% endblock %}
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6">
+    <div class="mb-4">
+        <a href="{{ url_for('shared_budgets.list_shared_budgets') }}" class="text-indigo-600 hover:underline">
+            <i class="fas fa-arrow-left mr-1"></i>Back to Shared Budgets
+        </a>
+    </div>
+
+    <div class="flex justify-between items-start mb-6">
+        <div>
+            <h2 class="text-2xl font-semibold">{{ budget.name }}</h2>
+            <p class="text-gray-600">
+                Shared between {{ budget.owner.username }} and {{ budget.shared_with.username }}
+            </p>
+        </div>
+        <p class="text-3xl font-bold text-indigo-600">${{ "%.2f"|format(budget.amount) }}</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6 mb-6">
+        <div>
+            <p class="text-sm text-gray-500">Period</p>
+            <p>{{ budget.period|capitalize }} ({{ budget.start_date.strftime('%Y-%m-%d') }} to {{ budget.end_date.strftime('%Y-%m-%d') if budget.end_date else '∞' }})</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">Category</p>
+            <p><span class="inline-block w-3 h-3 rounded-full mr-1" style="background-color: {{ budget.category.color }};"></span> {{ budget.category.name }}</p>
+        </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="mb-6">
+        <div class="flex justify-between text-sm mb-1">
+            <span>Total Spent: ${{ "%.2f"|format(total_spent) }}</span>
+            <span>Remaining: ${{ "%.2f"|format(remaining) }}</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-4">
+            <div class="h-4 rounded-full {% if progress >= 100 %}bg-red-600{% else %}bg-indigo-600{% endif %}" style="width: {{ progress }}%"></div>
+        </div>
+    </div>
+
+    <!-- Split by user -->
+    <h3 class="text-lg font-semibold mb-3">Spending Breakdown</h3>
+    <div class="space-y-4">
+        <div class="flex items-center">
+            <div class="w-32 font-medium">{{ budget.owner.username }}</div>
+            <div class="flex-1">
+                <div class="flex justify-between mb-1">
+                    <span>${{ "%.2f"|format(spent_owner) }}</span>
+                    <span>{{ (spent_owner / budget.amount * 100)|round|int }}%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div class="bg-blue-600 h-2.5 rounded-full" style="width: {{ (spent_owner / budget.amount * 100)|round }}%"></div>
+                </div>
+            </div>
+        </div>
+        <div class="flex items-center">
+            <div class="w-32 font-medium">{{ budget.shared_with.username }}</div>
+            <div class="flex-1">
+                <div class="flex justify-between mb-1">
+                    <span>${{ "%.2f"|format(spent_partner) }}</span>
+                    <span>{{ (spent_partner / budget.amount * 100)|round|int }}%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div class="bg-green-600 h-2.5 rounded-full" style="width: {{ (spent_partner / budget.amount * 100)|round }}%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

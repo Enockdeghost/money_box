@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, app, app
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
@@ -23,6 +23,8 @@ def create_app(config_class=Config):
     mail.init_app(app)
 
     # Register blueprints
+    from app.routes.subscriptions import bp as subscriptions_bp
+    app.register_blueprint(subscriptions_bp, url_prefix='/subscriptions')
     from app.routes import auth, main, wallets, transactions, categories, budgets, savings, bills, debts, reports, sync, settings
     app.register_blueprint(auth.bp)
     app.register_blueprint(main.bp)

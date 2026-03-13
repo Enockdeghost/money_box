@@ -1,7 +1,7 @@
 from flask import Flask
 from config import Config
 from app.extensions import db, migrate, login_manager, mail
-
+from app.routes.subscriptions import bp as subscriptions_bp
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
@@ -41,6 +41,7 @@ def create_app(config_class=Config):
     # Register blueprints
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
+    app.register_blueprint(subscriptions_bp, url_prefix='/subscriptions')
     app.register_blueprint(wallets_bp, url_prefix='/wallets')
     app.register_blueprint(transactions_bp, url_prefix='/transactions')
     app.register_blueprint(categories_bp, url_prefix='/categories')

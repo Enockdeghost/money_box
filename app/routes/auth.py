@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, session
+from flask import Blueprint, render_template, redirect, url_for, flash, request, session, current_app
 from flask_login import login_user, logout_user, current_user, login_required
 from app.extensions import db, mail
 from app.models import User, UserDevice, LoginHistory, Category, Wallet
@@ -6,13 +6,12 @@ from app.forms import LoginForm, RegistrationForm, RequestResetForm, ResetPasswo
 from app.utils.security import generate_verification_token, verify_verification_token, send_verification_email, send_reset_email
 from datetime import datetime
 import pyotp
-from flask import current_app 
 
 bp = Blueprint('auth', __name__)
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('main.dashboard'))  # Change from main.index to main.dashboard
+        return redirect(url_for('main.dashboard'))  
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -21,7 +20,6 @@ def login():
                 session['user_id'] = user.id
                 return redirect(url_for('auth.two_factor'))
             login_user(user, remember=form.remember.data)
-            # Record login
             device = UserDevice(
                 user_id=user.id,
                 device_name=request.user_agent.string[:100],
@@ -34,7 +32,6 @@ def login():
             db.session.add(LoginHistory(user_id=user.id, ip_address=request.remote_addr, user_agent=request.user_agent.string))
             db.session.commit()
             next_page = request.args.get('next')
-            # Redirect to dashboard instead of index
             return redirect(next_page) if next_page else redirect(url_for('main.dashboard'))
         else:
             flash('Invalid email or password.', 'danger')
@@ -128,13 +125,19 @@ def logout():
 @bp.route('/reset-password', methods=['GET', 'POST'])
 def reset_request():
     if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
+        return redirect(url_for('main.dashboard'))
     form = RequestResetForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user:
-            send_reset_email(user)
-        flash('If an account exists with that email, you will receive a password reset link.', 'info')
+            try:
+                send_reset_email(user)
+                flash('A password reset link has been sent to your email.', 'info')
+            except Exception as e:
+                print(f"Email error: {e}")
+                flash('Could not send email. Please contact support.', 'danger')
+        else:
+            flash('If an account exists with that email, a reset link will be sent.', 'info')
         return redirect(url_for('auth.login'))
     return render_template('auth/reset_request.html', form=form)
 

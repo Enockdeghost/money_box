@@ -89,3 +89,12 @@ def export():
     # This is a placeholder – actual export logic would go here
     flash(f'Exporting as {fmt} is not yet implemented.', 'info')
     return redirect(url_for('reports.reports'))
+
+@bp.route('/financial-health')
+@login_required
+def financial_health():
+    """Display financial health score and achievements."""
+    from app.models import Achievement
+    health_score = current_user.health_score if current_user.health_score is not None else 0
+    achievements = Achievement.query.filter_by(user_id=current_user.id).order_by(Achievement.earned_date.desc()).all()
+    return render_template('reports/financial_health.html', health_score=health_score, achievements=achievements)

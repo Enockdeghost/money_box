@@ -1,9 +1,10 @@
 from flask import Blueprint, render_template
 from flask_login import login_required, current_user
 from app.extensions import db
-from app.models import Wallet, Transaction, Budget, SavingsGoal, Bill
+from app.models import Achievement, Wallet, Transaction, Budget, SavingsGoal, Bill
 from datetime import datetime, timedelta
 from sqlalchemy import func
+from decimal import Decimal
 
 bp = Blueprint('main', __name__)
 
@@ -12,15 +13,23 @@ def landing():
     """Public landing page."""
     return render_template('landing.html')
 
+@bp.route('/achievements')
+@login_required
+def achievements():
+    from app.models import Achievement
+    achievements = Achievement.query.filter_by(user_id=current_user.id).order_by(Achievement.earned_date.desc()).all()
+    return render_template('main/achievements.html', achievements=achievements)
+
 @bp.route('/dashboard')
 @login_required
 def dashboard():
     """Protected dashboard for logged-in users."""
     # Net worth
+    health_score = current_user.health_score
+    achievements = Achievement.query.filter_by(user_id=current_user.id).order_by(Achievement.earned_date.desc()).limit(5).all()
     wallets = Wallet.query.filter_by(user_id=current_user.id, is_hidden=False).all()
     net_worth = sum(w.balance for w in wallets)
 
-    # This month's income/expense
     today = datetime.now().date()
     month_start = today.replace(day=1)
     transactions = Transaction.query.filter(
@@ -30,7 +39,6 @@ def dashboard():
     total_income = sum(t.amount for t in transactions if t.type == 'income')
     total_expense = sum(t.amount for t in transactions if t.type == 'expense')
 
-    # Recent transactions
     recent = Transaction.query.filter_by(user_id=current_user.id).order_by(Transaction.date.desc()).limit(10).all()
 
     # Budget progress
@@ -43,15 +51,16 @@ def dashboard():
             Transaction.type == 'expense',
             Transaction.date >= b.start_date,
             Transaction.date <= (b.end_date or today)
-        ).scalar() or 0.0
+        ).scalar()
+        if spent is None:
+            spent = Decimal('0.00')
         budget_data.append({
             'budget': b,
             'spent': spent,
             'remaining': b.amount - spent,
-            'progress': (spent / b.amount * 100) if b.amount else 0
+            'progress': (spent / b.amount * 100) if b.amount != 0 else 0
         })
 
-    # Upcoming bills (next 7 days)
     bills = Bill.query.filter_by(user_id=current_user.id, is_active=True).all()
     upcoming_bills = []
     for bill in bills:
