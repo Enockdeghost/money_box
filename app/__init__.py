@@ -1,56 +1,49 @@
 import sys
 import os
+import re
 from flask import Flask
 from app.extensions import db, migrate, login_manager, mail
 import logging
 from logging.handlers import RotatingFileHandler
 
-# Add the project root to Python path
-project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, project_root)
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Debug: print to verify
-print("Project root added to sys.path:", project_root)
-print("sys.path now:", sys.path)
+def get_database_uri():
+    """Return the database URI, converting to pg8000 dialect if needed."""
+    raw_uri = os.environ.get('DATABASE_URL', 'sqlite:///moneybox.db')
+    if raw_uri.startswith('postgres://') or raw_uri.startswith('postgresql://'):
+        raw_uri = re.sub(r'^postgres(ql)?://', 'postgresql+pg8000://', raw_uri)
+    return raw_uri
 
-def create_app(config_class=None):
-    # Try to import Config, with fallback if missing
-    if config_class is None:
-        try:
-            from config import Config
-            print("Successfully imported Config from file.")
-        except ImportError as e:
-            print(f"Failed to import config: {e}. Using fallback configuration.")
-            # Define a minimal Config class
-            class Config:
-                SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-key'
-                SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///moneybox.db'
-                SQLALCHEMY_TRACK_MODIFICATIONS = False
-                UPLOAD_FOLDER = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'static/uploads')
-                MAX_CONTENT_LENGTH = 16 * 1024 * 1024
-                MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
-                MAIL_PORT = int(os.environ.get('MAIL_PORT', 587))
-                MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'true').lower() == 'true'
-                MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
-                MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
-                MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
-                REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
-                EXCHANGE_RATE_API_KEY = os.environ.get('EXCHANGE_RATE_API_KEY')
-        config_class = Config
+class Config:
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-key'
+    SQLALCHEMY_DATABASE_URI = get_database_uri()
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    # File uploads
+    UPLOAD_FOLDER = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'static/uploads')
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024
+
+    # Mail settings
+    MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
+    MAIL_PORT = int(os.environ.get('MAIL_PORT', 587))
+    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'true').lower() == 'true'
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
+
+    # Redis for Celery
+    REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+
+    # Exchange rate API (optional)
+    EXCHANGE_RATE_API_KEY = os.environ.get('EXCHANGE_RATE_API_KEY')
+
+def create_app():
     app = Flask(__name__)
-    app.config.from_object(config_class)
+    app.config.from_object(Config)
 
-    # Debug: print the database URI
+    # Debug: print the database URI (visible in Render logs)
     print("CONFIG LOADED. DATABASE URI:", app.config.get('SQLALCHEMY_DATABASE_URI'))
-
-    if not app.config.get('SQLALCHEMY_DATABASE_URI'):
-        print("WARNING: SQLALCHEMY_DATABASE_URI not set, using fallback sqlite:///moneybox.db")
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///moneybox.db'
-
-    if not app.config.get('SECRET_KEY'):
-        print("WARNING: SECRET_KEY not set, using fallback dev-secret-key")
-        app.config['SECRET_KEY'] = 'dev-secret-key'
 
     # Initialize extensions
     db.init_app(app)
@@ -60,11 +53,9 @@ def create_app(config_class=None):
 
     # Logging configuration (only in non-debug mode)
     if not app.debug:
-        # Create logs directory if it doesn't exist
         log_dir = 'logs'
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
-
         file_handler = RotatingFileHandler(os.path.join(log_dir, 'moneybox.log'), maxBytes=10240, backupCount=10)
         file_handler.setFormatter(logging.Formatter(
             '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
@@ -72,7 +63,7 @@ def create_app(config_class=None):
         file_handler.setLevel(logging.INFO)
         app.logger.addHandler(file_handler)
 
-    # Import blueprints inside the factory to avoid circular imports
+    # Import blueprints
     from app.routes.auth import bp as auth_bp
     from app.routes.main import bp as main_bp
     from app.routes.wallets import bp as wallets_bp
