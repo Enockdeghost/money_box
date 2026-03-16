@@ -1,13 +1,15 @@
 import os
+import re
 from dotenv import load_dotenv
 
 load_dotenv()
 
 def get_database_uri():
-    """Return the database URI, converting postgres:// to postgresql+pg8000://."""
+    """Return the database URI, converting postgres:// or postgresql:// to postgresql+pg8000://."""
     raw_uri = os.environ.get('DATABASE_URL', 'sqlite:///moneybox.db')
-    if raw_uri.startswith('postgres://'):
-        raw_uri = raw_uri.replace('postgres://', 'postgresql+pg8000://', 1)
+    if raw_uri.startswith('postgres://') or raw_uri.startswith('postgresql://'):
+        # Use regex to replace the scheme
+        raw_uri = re.sub(r'^postgres(ql)?://', 'postgresql+pg8000://', raw_uri)
     return raw_uri
 
 class Config:
