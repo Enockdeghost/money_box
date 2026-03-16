@@ -2,20 +2,31 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>MoneyBox – Personal Finance Manager</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Custom styles (optional) -->
+    <!-- Custom styles -->
     <style>
         .feature-card:hover {
             transform: translateY(-5px);
             transition: transform 0.3s ease;
         }
         .gradient-bg {
-            background: #4f46e5; /* Solid indigo-600 – replaced gradient */
+            background: #4f46e5; /* Solid indigo-600 */
+        }
+        /* Extra small screen tweaks */
+        @media (max-width: 360px) {
+            .hero-button {
+                font-size: 0.9rem;
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            .pricing-card {
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
@@ -27,7 +38,7 @@
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
                     <span class="text-2xl font-bold text-indigo-600">MoneyBox</span>
-                    <span class="ml-2 text-sm bg-indigo-100 text-indigo-800 px-2 py-1 rounded">Personal Finance</span>
+                    <span class="ml-2 text-sm bg-indigo-100 text-indigo-800 px-2 py-1 rounded hidden xs:inline-block">Personal Finance</span>
                 </div>
                 <div class="hidden md:flex space-x-8">
                     <a href="#features" class="text-gray-700 hover:text-indigo-600 transition">Features</a>
@@ -36,8 +47,8 @@
                     <a href="#testimonials" class="text-gray-700 hover:text-indigo-600 transition">Testimonials</a>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <a href="{{ url_for('auth.login') }}" class="text-gray-700 hover:text-indigo-600">Log in</a>
-                    <a href="{{ url_for('auth.register') }}" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">Sign up free</a>
+                    <a href="{{ url_for('auth.login') }}" class="text-gray-700 hover:text-indigo-600 text-sm sm:text-base">Log in</a>
+                    <a href="{{ url_for('auth.register') }}" class="bg-indigo-600 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg hover:bg-indigo-700 transition text-sm sm:text-base whitespace-nowrap">Sign up free</a>
                 </div>
             </div>
         </div>
@@ -45,31 +56,32 @@
 
     <!-- Hero Section -->
     <section class="gradient-bg text-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-28">
             <div class="grid md:grid-cols-2 gap-12 items-center">
                 <div>
-                    <h1 class="text-4xl md:text-5xl font-bold leading-tight">
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
                         Take Control of Your <span class="text-yellow-300">Money</span>
                     </h1>
-                    <p class="text-xl mt-4 opacity-90">
+                    <p class="text-lg sm:text-xl mt-4 opacity-90">
                         Track expenses, create budgets, analyze spending, and achieve your financial goals – all in one beautiful app.
                     </p>
-                    <div class="mt-8 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                        <a href="{{ url_for('auth.register') }}" class="bg-white text-indigo-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition text-center">
+                    <!-- Buttons: stack on mobile, row on larger -->
+                    <div class="mt-8 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
+                        <a href="{{ url_for('auth.register') }}" class="hero-button bg-white text-indigo-600 px-6 py-3 sm:px-8 sm:py-3 rounded-lg font-semibold hover:bg-gray-100 transition text-center">
                             <i class="fas fa-rocket mr-2"></i>Get Started – It's Free
                         </a>
-                        <a href="#demo" class="border border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-indigo-600 transition text-center">
+                        <a href="#demo" class="hero-button border border-white text-white px-6 py-3 sm:px-8 sm:py-3 rounded-lg font-semibold hover:bg-white hover:text-indigo-600 transition text-center">
                             <i class="fas fa-play-circle mr-2"></i>Watch Demo
                         </a>
                     </div>
-                    <div class="mt-6 flex items-center space-x-4 text-sm">
+                    <div class="mt-6 flex flex-wrap items-center gap-4 text-sm">
                         <span><i class="fas fa-check-circle mr-1"></i>No credit card</span>
                         <span><i class="fas fa-check-circle mr-1"></i>Cancel anytime</span>
                         <span><i class="fas fa-check-circle mr-1"></i>Secure & encrypted</span>
                     </div>
                 </div>
                 <div class="relative">
-                    <!-- App mockup placeholder -->
+                    <!-- App mockup placeholder (unchanged) -->
                     <div class="bg-white rounded-3xl shadow-2xl p-4">
                         <div class="bg-gray-200 rounded-t-2xl h-8 flex items-center px-4 space-x-2">
                             <div class="w-3 h-3 bg-red-500 rounded-full"></div>
@@ -125,17 +137,15 @@
         </div>
     </section>
 
-    <!-- Features Overview -->
+    <!-- Features Overview (unchanged) -->
     <section id="features" class="py-20 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
                 <h2 class="text-3xl md:text-4xl font-bold text-gray-900">Everything you need to master your finances</h2>
                 <p class="text-xl text-gray-600 mt-4">MoneyBox combines powerful features with an intuitive interface.</p>
             </div>
-
-            <!-- Feature grid (simplified for brevity) -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- 1. Core Features -->
+                <!-- Feature cards (unchanged) -->
                 <div class="feature-card bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition">
                     <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 text-xl mb-4">
                         <i class="fas fa-exchange-alt"></i>
@@ -143,7 +153,6 @@
                     <h3 class="text-xl font-semibold mb-2">Core Tracking</h3>
                     <p class="text-gray-600 mb-4">Income, expenses, transaction history, categories, notes, receipts, and quick entry.</p>
                 </div>
-                <!-- 2. Budget Management -->
                 <div class="feature-card bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition">
                     <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 text-xl mb-4">
                         <i class="fas fa-chart-pie"></i>
@@ -151,7 +160,6 @@
                     <h3 class="text-xl font-semibold mb-2">Budget Management</h3>
                     <p class="text-gray-600 mb-4">Monthly/weekly budgets, category limits, progress tracking, and alerts.</p>
                 </div>
-                <!-- 3. Reports & Analytics -->
                 <div class="feature-card bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition">
                     <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 text-xl mb-4">
                         <i class="fas fa-chart-line"></i>
@@ -159,7 +167,6 @@
                     <h3 class="text-xl font-semibold mb-2">Reports & Analytics</h3>
                     <p class="text-gray-600 mb-4">Expense reports, income reports, pie charts, trends, and financial summary.</p>
                 </div>
-                <!-- 4. Wallet & Account Management -->
                 <div class="feature-card bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition">
                     <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 text-xl mb-4">
                         <i class="fas fa-wallet"></i>
@@ -167,7 +174,6 @@
                     <h3 class="text-xl font-semibold mb-2">Wallet Management</h3>
                     <p class="text-gray-600 mb-4">Multiple wallets (cash, bank, credit), transfers, balance tracking, and shared wallets.</p>
                 </div>
-                <!-- 5. Savings & Goals -->
                 <div class="feature-card bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition">
                     <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 text-xl mb-4">
                         <i class="fas fa-bullseye"></i>
@@ -175,7 +181,6 @@
                     <h3 class="text-xl font-semibold mb-2">Savings Goals</h3>
                     <p class="text-gray-600 mb-4">Set savings targets, track progress, emergency fund, and goal-based plans.</p>
                 </div>
-                <!-- 6. Bills & Recurring Payments -->
                 <div class="feature-card bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition">
                     <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 text-xl mb-4">
                         <i class="fas fa-calendar-alt"></i>
@@ -187,7 +192,7 @@
         </div>
     </section>
 
-    <!-- How It Works -->
+    <!-- How It Works (unchanged) -->
     <section id="how-it-works" class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
@@ -227,9 +232,9 @@
                 <h2 class="text-3xl md:text-4xl font-bold text-gray-900">Simple, Transparent Pricing</h2>
                 <p class="text-xl text-gray-600 mt-4">Start free, upgrade when you need more.</p>
             </div>
-            <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
                 <!-- Free Plan -->
-                <div class="bg-white rounded-2xl shadow-lg p-8 border-2 border-gray-100">
+                <div class="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border-2 border-gray-100">
                     <h3 class="text-2xl font-bold mb-2">Free</h3>
                     <p class="text-gray-600 mb-4">For individuals just starting</p>
                     <p class="text-4xl font-bold mb-6">$0</p>
@@ -242,7 +247,7 @@
                     <a href="{{ url_for('auth.register') }}" class="block text-center bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition">Get Started</a>
                 </div>
                 <!-- Premium Plan -->
-                <div class="bg-white rounded-2xl shadow-xl p-8 border-4 border-indigo-500 relative transform scale-105">
+                <div class="bg-white rounded-2xl shadow-xl p-6 sm:p-8 border-4 border-indigo-500 relative transform scale-105 md:scale-105">
                     <div class="absolute top-0 right-0 bg-indigo-500 text-white px-3 py-1 rounded-bl-lg rounded-tr-lg text-sm font-semibold">Most Popular</div>
                     <h3 class="text-2xl font-bold mb-2">Premium</h3>
                     <p class="text-gray-600 mb-4">Serious about saving</p>
@@ -257,7 +262,7 @@
                     <a href="{{ url_for('auth.register') }}" class="block text-center bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition">Start 14-day free trial</a>
                 </div>
                 <!-- Family Plan -->
-                <div class="bg-white rounded-2xl shadow-lg p-8 border-2 border-gray-100">
+                <div class="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border-2 border-gray-100">
                     <h3 class="text-2xl font-bold mb-2">Family</h3>
                     <p class="text-gray-600 mb-4">Up to 5 members</p>
                     <p class="text-4xl font-bold mb-6">$9.99<span class="text-lg font-normal text-gray-500">/month</span></p>
@@ -273,7 +278,7 @@
         </div>
     </section>
 
-    <!-- Testimonials -->
+    <!-- Testimonials (unchanged) -->
     <section id="testimonials" class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
@@ -318,16 +323,16 @@
     <!-- CTA -->
     <section class="gradient-bg text-white py-20">
         <div class="max-w-4xl mx-auto text-center px-4">
-            <h2 class="text-3xl md:text-4xl font-bold mb-4">Ready to take control of your money?</h2>
-            <p class="text-xl opacity-90 mb-8">Join MoneyBox today and start your journey to financial freedom.</p>
-            <a href="{{ url_for('auth.register') }}" class="bg-white text-indigo-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition inline-block">
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">Ready to take control of your money?</h2>
+            <p class="text-lg sm:text-xl opacity-90 mb-8">Join MoneyBox today and start your journey to financial freedom.</p>
+            <a href="{{ url_for('auth.register') }}" class="bg-white text-indigo-600 px-6 py-3 sm:px-8 sm:py-4 rounded-lg font-semibold text-base sm:text-lg hover:bg-gray-100 transition inline-block">
                 <i class="fas fa-user-plus mr-2"></i>Create your free account
             </a>
             <p class="mt-4 text-sm opacity-75">No credit card required • Cancel anytime</p>
         </div>
     </section>
 
-    <!-- Footer -->
+    <!-- Footer (unchanged) -->
     <footer class="bg-gray-900 text-white py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-4 gap-8">
             <div>
