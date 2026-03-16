@@ -1,10 +1,16 @@
 import json
+import csv
+import io
 from datetime import datetime, timedelta
 from app.extensions import db
 from app.models import (
     User, Wallet, Category, Transaction, Budget,
     SavingsGoal, Bill, Debt, Loan
 )
+import openpyxl
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+
 
 def export_user_data(user_id, data_type='all', start_date=None, end_date=None):
     """Export user data as dictionary."""
@@ -95,6 +101,7 @@ def export_user_data(user_id, data_type='all', start_date=None, end_date=None):
     
     return data
 
+
 def import_from_json(data, user_id, duplicate_handling='skip'):
     """Import data from JSON dict."""
     stats = {'created': 0, 'updated': 0, 'skipped': 0}
@@ -119,3 +126,47 @@ def import_from_json(data, user_id, duplicate_handling='skip'):
     # Similar for other entities (simplified)
     db.session.commit()
     return stats
+
+
+
+def export_to_csv(rows):
+    """Export list of dicts to CSV string."""
+    output = io.StringIO()
+    if rows:
+        writer = csv.DictWriter(output, fieldnames=rows[0].keys())
+        writer.writeheader()
+        writer.writerows(rows)
+    return output.getvalue()
+
+
+def export_to_excel(rows):
+    """Export list of dicts to Excel binary."""
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    if rows:
+        ws.append(list(rows[0].keys()))
+        for row in rows:
+            ws.append(list(row.values()))
+    output = io.BytesIO()
+    wb.save(output)
+    output.seek(0)
+    return output.read()
+
+
+def export_to_pdf(rows, title):
+    """Export list of dicts to PDF (simple table)."""
+    buffer = io.BytesIO()
+    c = canvas.Canvas(buffer, pagesize=letter)
+    c.drawString(100, 750, title)
+    y = 700
+    for row in rows:
+        # Create a one-line summary from the row (customize as needed)
+        text = f"{row.get('Date','')} - {row.get('Description','')} - {row.get('Amount','')}"
+        c.drawString(100, y, text)
+        y -= 20
+        if y < 50:
+            c.showPage()
+            y = 750
+    c.save()
+    buffer.seek(0)
+    return buffer.read()
