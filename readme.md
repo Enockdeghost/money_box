@@ -1,5 +1,4 @@
 
-```markdown
 # MoneyBox - Personal Finance Manager
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -200,6 +199,22 @@ Follow these steps to get MoneyBox running on your local machine for development
     pip install -r requirements.txt
     ```
 
+4.  **Set up environment variables**
+    Create a `.env` file in the project root and add the following (adjust as needed):
+    ```env
+    SECRET_KEY=your-super-secret-key-change-this-in-production
+    DATABASE_URL=sqlite:///moneybox.db
+    # For email features (use a real SMTP server in production)
+    MAIL_SERVER=smtp.gmail.com
+    MAIL_PORT=587
+    MAIL_USE_TLS=true
+    MAIL_USERNAME=your-email@gmail.com
+    MAIL_PASSWORD=your-app-password
+    MAIL_DEFAULT_SENDER=your-email@gmail.com
+    # For background tasks
+    REDIS_URL=redis://localhost:6379/0
+    ```
+
 5.  **Initialize the database**
     ```bash
     flask db init          # Run only the first time
@@ -275,15 +290,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 *   The Tailwind CSS team for making frontend styling a joy.
 *   All contributors and users who help make MoneyBox better.
 
----
-
-**Happy Budgeting!**
-```
-
-**What was fixed:**
-1. Added the missing **environment variables configuration step** (Step 4) which is essential for the app to run correctly.
-2. Fixed the badge URLs to point to valid Shields.io endpoints (the previous ones were placeholders).
-3. Removed the duplicate "History" section from the GitHub auto-generated part.
-4. Ensured all formatting is consistent.
-
-Now your README is complete and error-free. You can copy this entire content and replace your existing `readme.md` file.
+-
