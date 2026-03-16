@@ -10,6 +10,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Custom styles -->
     <style>
+        html {
+            scroll-behavior: smooth;
+        }
         .feature-card:hover {
             transform: translateY(-5px);
             transition: transform 0.3s ease;
@@ -81,7 +84,7 @@
                     </div>
                 </div>
                 <div class="relative">
-                    <!-- App mockup placeholder (unchanged) -->
+                    <!-- App mockup placeholder -->
                     <div class="bg-white rounded-3xl shadow-2xl p-4">
                         <div class="bg-gray-200 rounded-t-2xl h-8 flex items-center px-4 space-x-2">
                             <div class="w-3 h-3 bg-red-500 rounded-full"></div>
@@ -137,7 +140,59 @@
         </div>
     </section>
 
-    <!-- Features Overview (unchanged) -->
+    <!-- ========== NEW DEMO SECTION ========== -->
+    <section id="demo" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900">See MoneyBox in Action</h2>
+                <p class="text-xl text-gray-600 mt-4">Watch a quick demo to see how easy it is to manage your money.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <!-- Video/Image Placeholder -->
+                <div class="relative rounded-2xl overflow-hidden shadow-2xl group cursor-pointer" onclick="alert('Demo video would play here. You can replace this with a YouTube embed.')">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80" alt="Dashboard preview" class="w-full h-auto object-cover">
+                    <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center group-hover:bg-opacity-50 transition">
+                        <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg">
+                            <i class="fas fa-play text-indigo-600 text-3xl ml-1"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Description -->
+                <div>
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-4">What you'll learn</h3>
+                    <ul class="space-y-3 text-gray-600">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-indigo-600 mr-3 mt-1"></i>
+                            <span>How to add wallets and track your cash, bank accounts, and credit cards.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-indigo-600 mr-3 mt-1"></i>
+                            <span>Recording income and expenses in seconds, with receipts and tags.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-indigo-600 mr-3 mt-1"></i>
+                            <span>Setting up budgets and monitoring your progress with visual charts.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-indigo-600 mr-3 mt-1"></i>
+                            <span>Creating savings goals and enabling round‑ups to save automatically.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-indigo-600 mr-3 mt-1"></i>
+                            <span>Managing bills and subscriptions so you never miss a payment.</span>
+                        </li>
+                    </ul>
+                    <div class="mt-8">
+                        <a href="{{ url_for('auth.register') }}" class="inline-flex items-center bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition">
+                            <i class="fas fa-user-plus mr-2"></i> Try it yourself – it's free
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Overview -->
     <section id="features" class="py-20 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
@@ -145,7 +200,7 @@
                 <p class="text-xl text-gray-600 mt-4">MoneyBox combines powerful features with an intuitive interface.</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Feature cards (unchanged) -->
+                <!-- 1. Core Features -->
                 <div class="feature-card bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition">
                     <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 text-xl mb-4">
                         <i class="fas fa-exchange-alt"></i>
@@ -153,6 +208,7 @@
                     <h3 class="text-xl font-semibold mb-2">Core Tracking</h3>
                     <p class="text-gray-600 mb-4">Income, expenses, transaction history, categories, notes, receipts, and quick entry.</p>
                 </div>
+                <!-- 2. Budget Management -->
                 <div class="feature-card bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition">
                     <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 text-xl mb-4">
                         <i class="fas fa-chart-pie"></i>
@@ -160,6 +216,7 @@
                     <h3 class="text-xl font-semibold mb-2">Budget Management</h3>
                     <p class="text-gray-600 mb-4">Monthly/weekly budgets, category limits, progress tracking, and alerts.</p>
                 </div>
+                <!-- 3. Reports & Analytics -->
                 <div class="feature-card bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition">
                     <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 text-xl mb-4">
                         <i class="fas fa-chart-line"></i>
@@ -167,6 +224,7 @@
                     <h3 class="text-xl font-semibold mb-2">Reports & Analytics</h3>
                     <p class="text-gray-600 mb-4">Expense reports, income reports, pie charts, trends, and financial summary.</p>
                 </div>
+                <!-- 4. Wallet & Account Management -->
                 <div class="feature-card bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition">
                     <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 text-xl mb-4">
                         <i class="fas fa-wallet"></i>
@@ -174,6 +232,7 @@
                     <h3 class="text-xl font-semibold mb-2">Wallet Management</h3>
                     <p class="text-gray-600 mb-4">Multiple wallets (cash, bank, credit), transfers, balance tracking, and shared wallets.</p>
                 </div>
+                <!-- 5. Savings & Goals -->
                 <div class="feature-card bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition">
                     <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 text-xl mb-4">
                         <i class="fas fa-bullseye"></i>
@@ -181,6 +240,7 @@
                     <h3 class="text-xl font-semibold mb-2">Savings Goals</h3>
                     <p class="text-gray-600 mb-4">Set savings targets, track progress, emergency fund, and goal-based plans.</p>
                 </div>
+                <!-- 6. Bills & Recurring Payments -->
                 <div class="feature-card bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition">
                     <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 text-xl mb-4">
                         <i class="fas fa-calendar-alt"></i>
@@ -192,7 +252,7 @@
         </div>
     </section>
 
-    <!-- How It Works (unchanged) -->
+    <!-- How It Works -->
     <section id="how-it-works" class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
@@ -278,7 +338,7 @@
         </div>
     </section>
 
-    <!-- Testimonials (unchanged) -->
+    <!-- Testimonials -->
     <section id="testimonials" class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
@@ -332,7 +392,7 @@
         </div>
     </section>
 
-    <!-- Footer (unchanged) -->
+    <!-- Footer -->
     <footer class="bg-gray-900 text-white py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-4 gap-8">
             <div>
