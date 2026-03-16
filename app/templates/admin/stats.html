@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}System Statistics - MoneyBox{% endblock %}
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6">
+    <h2 class="text-2xl font-semibold mb-6">System Statistics</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="border rounded-lg p-4">
+            <h3 class="font-semibold text-lg mb-3">Financial Totals</h3>
+            <ul class="space-y-2">
+                <li class="flex justify-between"><span>Total Wallet Balance:</span> <span class="font-bold">${{ "%.2f"|format(total_wallet_balance) }}</span></li>
+                <li class="flex justify-between"><span>Total Transaction Value:</span> <span class="font-bold">${{ "%.2f"|format(total_transaction_amount) }}</span></li>
+                <li class="flex justify-between"><span>Total Budgeted Amount:</span> <span class="font-bold">${{ "%.2f"|format(total_budget_amount) }}</span></li>
+                <li class="flex justify-between"><span>Total Savings Target:</span> <span class="font-bold">${{ "%.2f"|format(total_savings_target) }}</span></li>
+                <li class="flex justify-between"><span>Total Saved So Far:</span> <span class="font-bold">${{ "%.2f"|format(total_savings_current) }}</span></li>
+            </ul>
+        </div>
+
+        <div class="border rounded-lg p-4">
+            <h3 class="font-semibold text-lg mb-3">Transaction Counts</h3>
+            <ul class="space-y-2">
+                <li class="flex justify-between"><span>Income Transactions:</span> <span class="font-bold">{{ income_count }}</span></li>
+                <li class="flex justify-between"><span>Expense Transactions:</span> <span class="font-bold">{{ expense_count }}</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="mt-6">
+        <canvas id="systemChart" height="100"></canvas>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('systemChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Wallets', 'Transactions', 'Budgets', 'Goals', 'Bills', 'Debts', 'Loans'],
+                datasets: [{
+                    label: 'Counts',
+                    data: [
+                        {{ total_wallets }},
+                        {{ total_transactions }},
+                        {{ total_budgets }},
+                        {{ total_savings }},
+                        {{ total_bills }},
+                        {{ total_debts }},
+                        {{ total_loans }}
+                    ],
+                    backgroundColor: '#4f46e5'
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    });
+</script>
+{% endblock %}

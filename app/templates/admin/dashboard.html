@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard - MoneyBox{% endblock %}
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6">
+    <h2 class="text-2xl font-semibold mb-6">Admin Dashboard</h2>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-indigo-50 p-4 rounded-lg">
+            <p class="text-sm text-indigo-600">Total Users</p>
+            <p class="text-3xl font-bold">{{ total_users }}</p>
+            <p class="text-sm text-gray-500">{{ new_users }} new (7 days)</p>
+        </div>
+        <div class="bg-green-50 p-4 rounded-lg">
+            <p class="text-sm text-green-600">Wallets</p>
+            <p class="text-3xl font-bold">{{ total_wallets }}</p>
+        </div>
+        <div class="bg-blue-50 p-4 rounded-lg">
+            <p class="text-sm text-blue-600">Transactions</p>
+            <p class="text-3xl font-bold">{{ total_transactions }}</p>
+        </div>
+        <div class="bg-purple-50 p-4 rounded-lg">
+            <p class="text-sm text-purple-600">Categories</p>
+            <p class="text-3xl font-bold">{{ total_categories }}</p>
+        </div>
+        <div class="bg-yellow-50 p-4 rounded-lg">
+            <p class="text-sm text-yellow-600">Budgets</p>
+            <p class="text-3xl font-bold">{{ total_budgets }}</p>
+        </div>
+        <div class="bg-pink-50 p-4 rounded-lg">
+            <p class="text-sm text-pink-600">Savings Goals</p>
+            <p class="text-3xl font-bold">{{ total_savings }}</p>
+        </div>
+        <div class="bg-red-50 p-4 rounded-lg">
+            <p class="text-sm text-red-600">Bills</p>
+            <p class="text-3xl font-bold">{{ total_bills }}</p>
+        </div>
+        <div class="bg-orange-50 p-4 rounded-lg">
+            <p class="text-sm text-orange-600">Debts/Loans</p>
+            <p class="text-3xl font-bold">{{ total_debts + total_loans }}</p>
+        </div>
+    </div>
+
+    <!-- Recent Transactions -->
+    <h3 class="text-lg font-semibold mb-3">Recent Transactions (All Users)</h3>
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead>
+                <tr>
+                    <th class="px-4 py-2 text-left">User</th>
+                    <th class="px-4 py-2 text-left">Date</th>
+                    <th class="px-4 py-2 text-left">Description</th>
+                    <th class="px-4 py-2 text-left">Amount</th>
+                    <th class="px-4 py-2 text-left">Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in recent_transactions %}
+                <tr>
+                    <td class="px-4 py-2">{{ t.user.username }}</td>
+                    <td class="px-4 py-2">{{ t.date.strftime('%Y-%m-%d') }}</td>
+                    <td class="px-4 py-2">{{ t.description or '-' }}</td>
+                    <td class="px-4 py-2">${{ "%.2f"|format(t.amount) }}</td>
+                    <td class="px-4 py-2">{{ t.type|capitalize }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="px-4 py-2 text-gray-500">No transactions yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-6 grid grid-cols-2 gap-4">
+        <a href="{{ url_for('admin.users_list') }}" class="text-center bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Manage Users</a>
+        <a href="{{ url_for('admin.stats') }}" class="text-center bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">View Detailed Stats</a>
+    </div>
+</div>
+{% endblock %}

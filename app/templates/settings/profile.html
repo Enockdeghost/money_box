@@ -3,7 +3,7 @@
 {% block content %}
 <div class="bg-white rounded-lg shadow p-6 max-w-2xl mx-auto">
     <h2 class="text-2xl font-semibold mb-6">Profile Settings</h2>
-    <form method="post">
+   <form method="post" id="profile-form">
         {{ form.hidden_tag() }}
         <div class="mb-4">
             {{ form.username.label(class="block text-sm font-medium text-gray-700 mb-2") }}
@@ -15,11 +15,11 @@
         </div>
         <div class="mb-4">
             {{ form.language.label(class="block text-sm font-medium text-gray-700 mb-2") }}
-            {{ form.language(class="border rounded-lg px-3 py-2 w-full") }}
+            {{ form.language(class="border rounded-lg px-3 py-2 w-full", id="language-select") }}
         </div>
         <div class="mb-4">
             {{ form.theme.label(class="block text-sm font-medium text-gray-700 mb-2") }}
-            {{ form.theme(class="border rounded-lg px-3 py-2 w-full") }}
+            {{ form.theme(class="border rounded-lg px-3 py-2 w-full", id="theme-select") }}
         </div>
         <div class="mb-4">
             {{ form.currency.label(class="block text-sm font-medium text-gray-700 mb-2") }}
@@ -34,4 +34,16 @@
         </div>
     </form>
 </div>
+<script>
+    document.getElementById('profile-form').addEventListener('submit', function() {
+        const themeSelect = document.getElementById('theme-select');
+        if (themeSelect) {
+            localStorage.setItem('theme', themeSelect.value);
+        }
+        const langSelect = document.getElementById('language-select');
+        if (langSelect) {
+            localStorage.setItem('language', langSelect.value);
+        }
+    });
+</script>
 {% endblock %}

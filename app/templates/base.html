@@ -14,27 +14,78 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
         [x-cloak] { display: none !important; }
-         .dark body {
-        background-color: #1a202c;
-        color: #cbd5e0;
-         }
-        .dark .bg-white {
+
+        /* Dark mode comprehensive styles */
+        .dark body {
+            background-color: #1a202c;
+            color: #e2e8f0;
+        }
+        .dark .bg-white,
+        .dark .bg-gray-50,
+        .dark .bg-gray-100 {
             background-color: #2d3748 !important;
         }
-        .dark .bg-gray-50 {
-            background-color: #2d3748 !important;
-        }
-        .dark .text-gray-700 {
+        .dark .text-gray-700,
+        .dark .text-gray-600,
+        .dark .text-gray-500 {
             color: #e2e8f0 !important;
         }
         .dark .text-gray-900 {
             color: #f7fafc !important;
         }
-        .dark .border-gray-200 {
+        .dark .border,
+        .dark .border-gray-200,
+        .dark .border-gray-300 {
             border-color: #4a5568 !important;
         }
-        .dark .shadow-lg {
+        .dark .shadow-lg,
+        .dark .shadow-md,
+        .dark .shadow {
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3) !important;
+        }
+        .dark input,
+        .dark select,
+        .dark textarea {
+            background-color: #4a5568 !important;
+            color: #e2e8f0 !important;
+            border-color: #718096 !important;
+        }
+        .dark .form-checkbox {
+            background-color: #4a5568;
+            border-color: #718096;
+        }
+        .dark .bg-indigo-100 {
+            background-color: #434190 !important;
+        }
+        .dark .text-indigo-600 {
+            color: #a3bffa !important;
+        }
+        .dark .hover\:bg-indigo-50:hover {
+            background-color: #434190 !important;
+        }
+        .dark .bg-green-100 {
+            background-color: #22543d !important;
+        }
+        .dark .text-green-700 {
+            color: #9ae6b4 !important;
+        }
+        .dark .bg-red-100 {
+            background-color: #742a2a !important;
+        }
+        .dark .text-red-700 {
+            color: #feb2b2 !important;
+        }
+        .dark .bg-yellow-100 {
+            background-color: #744210 !important;
+        }
+        .dark .text-yellow-700 {
+            color: #faf089 !important;
+        }
+        .dark .bg-blue-100 {
+            background-color: #2a4365 !important;
+        }
+        .dark .text-blue-700 {
+            color: #bee3f8 !important;
         }
     </style>
     {% block head %}{% endblock %}
@@ -104,12 +155,17 @@
                                 <i class="fas fa-cog w-5 h-5 mr-3"></i>Settings
                             </a>
                         </li>
+                        <!-- Admin Panel Link (visible only to admin users) -->
+                        {% if current_user.is_authenticated and current_user.is_admin %}
+                        <li>
+                            <a href="{{ url_for('admin.dashboard') }}" class="flex items-center px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg mx-2">
+                                <i class="fas fa-crown w-5 h-5 mr-3"></i>Admin Panel
+                            </a>
+                        </li>
+                        {% endif %}
                     </ul>
                 </nav>
-                <button id="theme-toggle" class="text-gray-500 focus:outline-none">
-                    <i class="fas fa-sun" id="theme-icon"></i>
-                </button>
-                                <div class="border-t border-gray-200 p-4">
+                <div class="border-t border-gray-200 p-4">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
                             <span class="inline-block h-8 w-8 rounded-full bg-indigo-600 text-white flex items-center justify-center">{{ current_user.username[0]|upper }}</span>
@@ -139,7 +195,6 @@
                         <span class="text-2xl font-bold text-indigo-600">MoneyBox</span>
                     </div>
                     <nav class="mt-5 px-2 space-y-1">
-                        <!-- Same navigation links as desktop -->
                         <a href="{{ url_for('main.dashboard') }}" class="flex items-center px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg">
                             <i class="fas fa-tachometer-alt w-5 h-5 mr-3"></i>Dashboard
                         </a>
@@ -173,6 +228,12 @@
                         <a href="{{ url_for('settings.profile') }}" class="flex items-center px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg">
                             <i class="fas fa-cog w-5 h-5 mr-3"></i>Settings
                         </a>
+                        <!-- Admin Panel Link (visible only to admin users) -->
+                        {% if current_user.is_authenticated and current_user.is_admin %}
+                        <a href="{{ url_for('admin.dashboard') }}" class="flex items-center px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg">
+                            <i class="fas fa-crown w-5 h-5 mr-3"></i>Admin Panel
+                        </a>
+                        {% endif %}
                     </nav>
                 </div>
                 <div class="flex-shrink-0 flex border-t border-gray-200 p-4">
@@ -191,12 +252,15 @@
 
         <!-- Main Content -->
         <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- Top bar with hamburger button -->
+            <!-- Top bar with hamburger button and theme toggle -->
             <header class="bg-white border-b border-gray-200 py-4 px-6 flex items-center justify-between">
                 <button @click="sidebarOpen = true" class="md:hidden text-gray-500 focus:outline-none">
                     <i class="fas fa-bars text-2xl"></i>
                 </button>
-                <div class="flex-1 flex justify-end space-x-4">
+                <div class="flex-1 flex justify-end items-center space-x-4">
+                    <button id="theme-toggle" class="text-gray-500 focus:outline-none">
+                        <i class="fas fa-sun" id="theme-icon"></i>
+                    </button>
                     <span class="text-sm text-gray-600">{{ today }}</span>
                     <a href="{{ url_for('auth.logout') }}" class="text-sm text-red-600 hover:text-red-800"><i class="fas fa-sign-out-alt mr-1"></i>Logout</a>
                 </div>
@@ -221,5 +285,49 @@
             </main>
         </div>
     </div>
+
+    <!-- Theme toggle script (applies theme immediately) -->
+    <script>
+        (function() {
+            // Apply saved theme immediately to avoid flicker
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+
+            // Set up toggle after DOM loads
+            document.addEventListener('DOMContentLoaded', function() {
+                const themeToggle = document.getElementById('theme-toggle');
+                const themeIcon = document.getElementById('theme-icon');
+
+                if (!themeToggle || !themeIcon) {
+                    console.warn('Theme toggle elements not found');
+                    return;
+                }
+
+                // Set initial icon based on current theme
+                themeIcon.className = document.documentElement.classList.contains('dark') ? 'fas fa-moon' : 'fas fa-sun';
+
+                themeToggle.addEventListener('click', function() {
+                    const isDark = document.documentElement.classList.contains('dark');
+                    const newTheme = isDark ? 'light' : 'dark';
+
+                    // Apply theme
+                    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+                    themeIcon.className = newTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+                    localStorage.setItem('theme', newTheme);
+
+                    // Save to user preferences via AJAX (non-blocking)
+                    fetch('{{ url_for("settings.set_theme") }}', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({theme: newTheme})
+                    }).catch(err => console.warn('Could not save theme preference', err));
+                });
+            });
+        })();
+    </script>
 </body>
 </html>

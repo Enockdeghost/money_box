@@ -20,6 +20,9 @@ class User(UserMixin, db.Model):
     two_factor_secret = db.Column(db.String(32))
     passcode = db.Column(db.String(128))
     biometric_enabled = db.Column(db.Boolean, default=False)
+    is_admin = db.Column(db.Boolean, default=False)
+    biometric_enabled = db.Column(db.Boolean, default=False)
+    is_admin = db.Column(db.Boolean, default=False)
 
     health_score = db.Column(db.Integer, default=0)
     health_score_updated_at = db.Column(db.DateTime)

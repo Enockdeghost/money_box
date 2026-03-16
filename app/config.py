@@ -3,17 +3,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-class Config:
-    # Security
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
+if os.environ.get('FLASK_ENV') != 'production':
+    load_dotenv()
 
-    # Database
+class Config:
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-key'
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///moneybox.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # File uploads
     UPLOAD_FOLDER = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'app/static/uploads')
-    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  
 
     MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
     MAIL_PORT = int(os.environ.get('MAIL_PORT', 587))

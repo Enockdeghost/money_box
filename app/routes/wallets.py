@@ -4,6 +4,7 @@ from app.extensions import db
 from app.models import Wallet, Transaction, Category, SharedWallet, User
 from app.forms import WalletForm, TransferForm
 from datetime import datetime
+from decimal import Decimal
 
 bp = Blueprint('wallets', __name__)
 
@@ -105,7 +106,6 @@ def share_wallet(wallet_id):
 @login_required
 def transfer():
     form = TransferForm()
-    # Populate wallet choices
     wallets = Wallet.query.filter_by(user_id=current_user.id).all()
     form.from_wallet.choices = [(w.id, f"{w.name} (${w.balance})") for w in wallets]
     form.to_wallet.choices = [(w.id, w.name) for w in wallets]
@@ -113,23 +113,21 @@ def transfer():
     if form.validate_on_submit():
         from_wallet = Wallet.query.get(form.from_wallet.data)
         to_wallet = Wallet.query.get(form.to_wallet.data)
-        amount = form.amount.data
+        # Convert amount to Decimal
+        amount = Decimal(str(form.amount.data))
         date = form.date.data
         description = form.description.data or f"Transfer from {from_wallet.name} to {to_wallet.name}"
 
-        # Check sufficient balance
         if from_wallet.balance < amount:
             flash('Insufficient balance in source wallet.', 'danger')
             return render_template('wallets/transfer.html', form=form)
 
-        # Create transfer category (or use a system category)
         transfer_cat = Category.query.filter_by(user_id=current_user.id, name='Transfer', is_system=True).first()
         if not transfer_cat:
             transfer_cat = Category(name='Transfer', type='expense', user_id=current_user.id, is_system=True)
             db.session.add(transfer_cat)
             db.session.commit()
 
-        # Create expense transaction for from_wallet
         t1 = Transaction(
             amount=amount,
             type='expense',
@@ -140,7 +138,6 @@ def transfer():
             user_id=current_user.id,
             transfer_target_wallet_id=to_wallet.id
         )
-        # Create income transaction for to_wallet
         t2 = Transaction(
             amount=amount,
             type='income',
@@ -151,12 +148,10 @@ def transfer():
             user_id=current_user.id,
             transfer_target_wallet_id=from_wallet.id
         )
-        # Link them
         t1.transfer_transaction_id = t2.id
         t2.transfer_transaction_id = t1.id
 
         db.session.add_all([t1, t2])
-        # Update balances
         from_wallet.balance -= amount
         to_wallet.balance += amount
         db.session.commit()
