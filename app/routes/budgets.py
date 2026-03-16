@@ -5,6 +5,7 @@ from app.models import Budget, Category, Transaction
 from app.forms import BudgetForm
 from datetime import datetime
 from sqlalchemy import func
+from decimal import Decimal
 
 bp = Blueprint('budgets', __name__)
 
@@ -21,12 +22,15 @@ def list_budgets():
             Transaction.type == 'expense',
             Transaction.date >= b.start_date,
             Transaction.date <= (b.end_date or today)
-        ).scalar() or 0.0
+        ).scalar()
+        if spent is None:
+            spent = Decimal('0.00')
+        # spent is now a Decimal
         budget_data.append({
             'budget': b,
             'spent': spent,
             'remaining': b.amount - spent,
-            'progress': (spent / b.amount * 100) if b.amount else 0,
+            'progress': (spent / b.amount * 100) if b.amount != 0 else 0,
             'days_left': (b.end_date - today).days if b.end_date else None
         })
     return render_template('budgets/list.html', budget_data=budget_data)
@@ -100,7 +104,8 @@ def budget_details(budget_id):
         Transaction.date >= budget.start_date,
         Transaction.date <= (budget.end_date or datetime.now().date())
     ).order_by(Transaction.date.desc()).all()
-    spent = sum(t.amount for t in transactions)
+    # sum of Decimal amounts (all are Decimal)
+    spent = sum((t.amount for t in transactions), Decimal('0.00'))
     remaining = budget.amount - spent
-    progress = (spent / budget.amount * 100) if budget.amount else 0
+    progress = (spent / budget.amount * 100) if budget.amount != 0 else 0
     return render_template('budgets/details.html', budget=budget, transactions=transactions, spent=spent, remaining=remaining, progress=progress)
