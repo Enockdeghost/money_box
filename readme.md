@@ -1,4 +1,3 @@
-You're right, there is an error in the README I provided. The installation steps are missing the crucial **environment variables configuration** step, and there's a formatting issue in the badges section. Here's the corrected and complete `README.md` file:
 
 ```markdown
 # MoneyBox - Personal Finance Manager
