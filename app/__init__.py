@@ -5,6 +5,7 @@ from flask import Flask
 from app.extensions import db, migrate, login_manager, mail
 import logging
 from logging.handlers import RotatingFileHandler
+from config import Config
 
 # Add project root to sys.path (if needed)
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
