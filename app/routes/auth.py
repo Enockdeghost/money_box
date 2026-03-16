@@ -3,15 +3,16 @@ from flask_login import login_user, logout_user, current_user, login_required
 from app.extensions import db, mail
 from app.models import User, UserDevice, LoginHistory, Category, Wallet
 from app.forms import LoginForm, RegistrationForm, RequestResetForm, ResetPasswordForm, TwoFactorForm, PasscodeForm
-from app.utils.security import generate_verification_token, verify_verification_token, send_verification_email, send_reset_email
+from app.utils.security import generate_verification_token, verify_verification_token, send_verification_email, send_reset_email, generate_reset_token
 from datetime import datetime
 import pyotp
 
 bp = Blueprint('auth', __name__)
+
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('main.dashboard'))  
+        return redirect(url_for('main.dashboard'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -20,6 +21,7 @@ def login():
                 session['user_id'] = user.id
                 return redirect(url_for('auth.two_factor'))
             login_user(user, remember=form.remember.data)
+            # Record login device
             device = UserDevice(
                 user_id=user.id,
                 device_name=request.user_agent.string[:100],
@@ -48,7 +50,7 @@ def two_factor():
         if totp.verify(form.token.data):
             login_user(user)
             session.pop('user_id', None)
-            return redirect(url_for('main.index'))
+            return redirect(url_for('main.dashboard'))
         else:
             flash('Invalid code.', 'danger')
     return render_template('auth/two_factor.html', form=form)
@@ -56,7 +58,7 @@ def two_factor():
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
+        return redirect(url_for('main.dashboard'))
     form = RegistrationForm()
     if form.validate_on_submit():
         user = User(username=form.username.data, email=form.email.data)
@@ -86,7 +88,7 @@ def register():
         )
         db.session.add(default_wallet)
 
-        # Check if mail is configured
+        # Handle email verification based on config
         if current_app.config.get('MAIL_USERNAME'):
             user.email_verification_token = generate_verification_token(user.email)
             send_verification_email(user)
@@ -112,7 +114,7 @@ def verify_email(token):
             flash('Your email has been verified. You can now log in.', 'success')
             return redirect(url_for('auth.login'))
     flash('The verification link is invalid or has expired.', 'danger')
-    return redirect(url_for('main.index'))
+    return redirect(url_for('main.landing'))
 
 @bp.route('/logout')
 @login_required
@@ -120,7 +122,7 @@ def logout():
     logout_user()
     session.clear()
     flash('You have been logged out.', 'info')
-    return redirect(url_for('main.landing'))  
+    return redirect(url_for('main.landing'))
 
 @bp.route('/reset-password', methods=['GET', 'POST'])
 def reset_request():
@@ -130,13 +132,16 @@ def reset_request():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user:
-            try:
+            if current_app.config.get('MAIL_USERNAME'):
                 send_reset_email(user)
                 flash('A password reset link has been sent to your email.', 'info')
-            except Exception as e:
-                print(f"Email error: {e}")
-                flash('Could not send email. Please contact support.', 'danger')
+            else:
+                # Development mode: show link directly
+                token = generate_reset_token(user)
+                reset_link = url_for('auth.reset_token', token=token, _external=True)
+                flash(f'Password reset link (development mode): {reset_link}', 'info')
         else:
+            # Always show same message for security
             flash('If an account exists with that email, a reset link will be sent.', 'info')
         return redirect(url_for('auth.login'))
     return render_template('auth/reset_request.html', form=form)
@@ -144,11 +149,13 @@ def reset_request():
 @bp.route('/reset-password/<token>', methods=['GET', 'POST'])
 def reset_token(token):
     if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
-    user = User.verify_reset_token(token)
-    if not user:
+        return redirect(url_for('main.dashboard'))
+    from app.utils.security import verify_reset_token
+    user_id = verify_reset_token(token)
+    if not user_id:
         flash('Invalid or expired token.', 'danger')
         return redirect(url_for('auth.reset_request'))
+    user = User.query.get(user_id)
     form = ResetPasswordForm()
     if form.validate_on_submit():
         user.set_password(form.password.data)
