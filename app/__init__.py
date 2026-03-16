@@ -1,8 +1,12 @@
+import sys
+import os
 from flask import Flask
 from app.extensions import db, migrate, login_manager, mail
 import logging
-import os
 from logging.handlers import RotatingFileHandler
+
+# Add the project root to Python path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def create_app(config_class=None):
     # Import config inside the function to avoid import errors
