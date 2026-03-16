@@ -6,12 +6,36 @@ import logging
 from logging.handlers import RotatingFileHandler
 
 # Add the project root to Python path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, project_root)
+
+# Debug: print to verify
+print("Project root added to sys.path:", project_root)
+print("sys.path now:", sys.path)
 
 def create_app(config_class=None):
-    # Import config inside the function to avoid import errors
+    # Try to import Config, with fallback if missing
     if config_class is None:
-        from config import Config
+        try:
+            from config import Config
+            print("Successfully imported Config from file.")
+        except ImportError as e:
+            print(f"Failed to import config: {e}. Using fallback configuration.")
+            # Define a minimal Config class
+            class Config:
+                SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-key'
+                SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///moneybox.db'
+                SQLALCHEMY_TRACK_MODIFICATIONS = False
+                UPLOAD_FOLDER = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'static/uploads')
+                MAX_CONTENT_LENGTH = 16 * 1024 * 1024
+                MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
+                MAIL_PORT = int(os.environ.get('MAIL_PORT', 587))
+                MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'true').lower() == 'true'
+                MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+                MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+                MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
+                REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+                EXCHANGE_RATE_API_KEY = os.environ.get('EXCHANGE_RATE_API_KEY')
         config_class = Config
 
     app = Flask(__name__)
