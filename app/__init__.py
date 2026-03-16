@@ -1,11 +1,15 @@
 from flask import Flask
-from config import Config
 from app.extensions import db, migrate, login_manager, mail
 import logging
 import os
 from logging.handlers import RotatingFileHandler
 
-def create_app(config_class=Config):
+def create_app(config_class=None):
+    # Import config inside the function to avoid import errors
+    if config_class is None:
+        from config import Config
+        config_class = Config
+
     app = Flask(__name__)
     app.config.from_object(config_class)
 
@@ -28,8 +32,6 @@ def create_app(config_class=Config):
 
     # Logging configuration (only in non-debug mode)
     if not app.debug:
-       
-
         # Create logs directory if it doesn't exist
         log_dir = 'logs'
         if not os.path.exists(log_dir):
