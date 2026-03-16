@@ -6,6 +6,9 @@ from app.extensions import db, migrate, login_manager, mail
 import logging
 from logging.handlers import RotatingFileHandler
 
+# Add project root to sys.path (if needed)
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 def get_database_uri():
     """Return the database URI, converting to pg8000 dialect if needed."""
     raw_uri = os.environ.get('DATABASE_URL', 'sqlite:///moneybox.db')
@@ -17,17 +20,14 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-key'
     SQLALCHEMY_DATABASE_URI = get_database_uri()
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-
     UPLOAD_FOLDER = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'static/uploads')
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
-
     MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
     MAIL_PORT = int(os.environ.get('MAIL_PORT', 587))
     MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'true').lower() == 'true'
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
-
     REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
     EXCHANGE_RATE_API_KEY = os.environ.get('EXCHANGE_RATE_API_KEY')
 
@@ -53,7 +53,7 @@ def create_app():
         file_handler.setLevel(logging.INFO)
         app.logger.addHandler(file_handler)
 
-    # Import blueprints
+    # Import blueprints – all inside create_app
     from app.routes.auth import bp as auth_bp
     from app.routes.main import bp as main_bp
     from app.routes.wallets import bp as wallets_bp
