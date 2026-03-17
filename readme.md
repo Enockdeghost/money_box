@@ -199,22 +199,6 @@ Follow these steps to get MoneyBox running on your local machine for development
     pip install -r requirements.txt
     ```
 
-4.  **Set up environment variables**
-    Create a `.env` file in the project root and add the following (adjust as needed):
-    ```env
-    SECRET_KEY=your-super-secret-key-change-this-in-production
-    DATABASE_URL=sqlite:///moneybox.db
-    # For email features (use a real SMTP server in production)
-    MAIL_SERVER=smtp.gmail.com
-    MAIL_PORT=587
-    MAIL_USE_TLS=true
-    MAIL_USERNAME=your-email@gmail.com
-    MAIL_PASSWORD=your-app-password
-    MAIL_DEFAULT_SENDER=your-email@gmail.com
-    # For background tasks
-    REDIS_URL=redis://localhost:6379/0
-    ```
-
 5.  **Initialize the database**
     ```bash
     flask db init          # Run only the first time
