@@ -134,40 +134,6 @@ moneybox/
 └── README.md                              # This file
 ```
 
-**File Structure Diagram (Conceptual):**
-
-```mermaid
-graph TD
-    subgraph "User Browser"
-        A[HTML/CSS/JS] -->|HTTP Requests| B(Flask App)
-    end
-
-    subgraph "Flask Application"
-        B --> C{Router (URL Map)}
-        C --> D[Auth Blueprint]
-        C --> E[Main Blueprint]
-        C --> F[Wallets Blueprint]
-        C --> G[Transactions Blueprint]
-        C --> H[Reports Blueprint]
-        C --> I[Settings Blueprint]
-        C --> J[...Other Blueprints]
-
-        D & E & F & G & H & I & J --> K[Core Logic / Utils]
-        K --> L[(Database via SQLAlchemy)]
-        K --> M[File System (Uploads)]
-    end
-
-    subgraph "Background Tasks (Celery)"
-        N[Redis Broker] --> O[Celery Worker]
-        O --> P[Task Modules (e.g., recurring transactions)]
-        P --> L
-    end
-
-    style B fill:#f9f,stroke:#333,stroke-width:2px
-    style C fill:#ccf,stroke:#333,stroke-width:2px
-    style O fill:#9cf,stroke:#333,stroke-width:2px
-    style L fill:#cfc,stroke:#333,stroke-width:2px
-```
 
 ## 🚀 Installation & Setup
 
