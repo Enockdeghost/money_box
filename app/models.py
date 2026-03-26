@@ -321,6 +321,7 @@ class Subscription(db.Model):
     reminder_days = db.Column(db.Integer, default=3)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
+    category = db.relationship('Category', backref='subscriptions')
 
 class Achievement(db.Model):
     id = db.Column(db.Integer, primary_key=True)

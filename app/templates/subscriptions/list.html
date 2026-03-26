@@ -31,7 +31,13 @@
                     <span class="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Soon</span>
                     {% endif %}
                 </p>
-                <p class="text-gray-500 mt-1"><span class="inline-block w-2 h-2 rounded-full mr-1" style="background-color: {{ sub.category.color }};"></span>{{ sub.category.name }}</p>
+                <p class="text-gray-500 mt-1">
+                    {% if sub.category %}
+                        <span class="inline-block w-2 h-2 rounded-full mr-1" style="background-color: {{ sub.category.color }};"></span>{{ sub.category.name }}
+                    {% else %}
+                        <span class="text-gray-400">Uncategorized</span>
+                    {% endif %}
+                </p>
             </div>
             <div class="mt-4 flex space-x-2">
                 <a href="{{ url_for('subscriptions.edit_subscription', sub_id=sub.id) }}" class="text-sm text-indigo-600 hover:underline">Edit</a>

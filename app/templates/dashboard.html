@@ -254,17 +254,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM ready, creating charts...');
 
-            // Check if Chart.js is loaded
-            if (typeof Chart === 'undefined') {
-                console.error('Chart.js not loaded!');
-                // Optionally show a message in the canvas placeholders
-                const canvases = document.querySelectorAll('canvas');
-                canvases.forEach(canvas => {
-                    canvas.parentNode.innerHTML += '<p class="text-red-500 text-sm">Chart library failed to load. Please refresh.</p>';
-                });
-                return;
-            }
-
             // Safely parse Flask data with fallbacks
             let months = [], incomeTrend = [], expenseTrend = [];
             let catLabels = [], catData = [], catColors = [];

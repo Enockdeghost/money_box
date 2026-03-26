@@ -10,9 +10,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Custom styles -->
     <style>
-        html {
-            scroll-behavior: smooth;
-        }
         .feature-card:hover {
             transform: translateY(-5px);
             transition: transform 0.3s ease;
@@ -73,7 +70,9 @@
                         <a href="{{ url_for('auth.register') }}" class="hero-button bg-white text-indigo-600 px-6 py-3 sm:px-8 sm:py-3 rounded-lg font-semibold hover:bg-gray-100 transition text-center">
                             <i class="fas fa-rocket mr-2"></i>Get Started – It's Free
                         </a>
-                        <!-- Removed the "Watch Demo" button as requested -->
+                        <a href="#demo" class="hero-button border border-white text-white px-6 py-3 sm:px-8 sm:py-3 rounded-lg font-semibold hover:bg-white hover:text-indigo-600 transition text-center">
+                            <i class="fas fa-play-circle mr-2"></i>Watch Demo
+                        </a>
                     </div>
                     <div class="mt-6 flex flex-wrap items-center gap-4 text-sm">
                         <span><i class="fas fa-check-circle mr-1"></i>No credit card</span>
@@ -138,7 +137,7 @@
         </div>
     </section>
 
-    <!-- Features Overview -->
+    <!-- Features Overview (unchanged) -->
     <section id="features" class="py-20 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
@@ -193,7 +192,7 @@
         </div>
     </section>
 
-    <!-- How It Works -->
+    <!-- How It Works (unchanged) -->
     <section id="how-it-works" class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
@@ -279,7 +278,7 @@
         </div>
     </section>
 
-    <!-- Testimonials -->
+    <!-- Testimonials (unchanged) -->
     <section id="testimonials" class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
@@ -333,7 +332,7 @@
         </div>
     </section>
 
-    <!-- Footer -->
+    <!-- Footer (unchanged) -->
     <footer class="bg-gray-900 text-white py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-4 gap-8">
             <div>

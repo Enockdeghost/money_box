@@ -72,22 +72,39 @@ def delete_subscription(sub_id):
     flash('Subscription deleted.', 'success')
     return redirect(url_for('subscriptions.list_subscriptions'))
 
+from datetime import date, timedelta
+from collections import defaultdict
+from flask import session
+
 @bp.route('/detect', methods=['GET', 'POST'])
 @login_required
 def detect_subscriptions():
     if request.method == 'POST':
         selected = request.form.getlist('selected')
-        # For simplicity, we'll just flash a message
-        flash(f'Selected {len(selected)} subscriptions to add (feature coming soon).', 'info')
+        suggested = session.get('detected_subscriptions', [])
+        for idx in selected:
+            idx = int(idx)
+            if idx < len(suggested):
+                s = suggested[idx]
+                sub = Subscription(
+                    name=s['name'],
+                    amount=s['amount'],
+                    billing_cycle='monthly',
+                    next_billing_date=s['dates'][-1] + timedelta(days=30),
+                    user_id=current_user.id,
+                )
+                db.session.add(sub)
+        db.session.commit()
+        session.pop('detected_subscriptions', None)
+        flash(f'Added {len(selected)} subscriptions.', 'success')
         return redirect(url_for('subscriptions.list_subscriptions'))
-    # Analyze last 6 months of transactions to find recurring patterns
+
     six_months_ago = date.today() - timedelta(days=180)
     transactions = Transaction.query.filter(
         Transaction.user_id == current_user.id,
         Transaction.type == 'expense',
         Transaction.date >= six_months_ago
     ).all()
-    # Group by (description, amount) and count occurrences
     candidates = defaultdict(list)
     for t in transactions:
         key = (t.description, float(t.amount))
@@ -103,4 +120,5 @@ def detect_subscriptions():
                     'amount': amount,
                     'dates': dates
                 })
+    session['detected_subscriptions'] = suggested
     return render_template('subscriptions/detect.html', suggested=suggested)
