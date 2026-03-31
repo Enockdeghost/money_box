@@ -61,7 +61,7 @@ MoneyBox is packed with features to manage every aspect of your personal finance
 *   **Achievements**: Unlock badges for positive financial behaviors (e.g., "First Goal Met," "30-Day Streak").
 *   **Export**: Download your reports and data in CSV, Excel, or PDF formats.
 
-### ☁️ Data Sync & Backup
+###  Data Sync & Backup
 *   **Cloud Backup**: Create manual or automatic backups of all your data.
 *   **Restore**: Easily restore from a previous backup.
 *   **Import/Export**: Import transactions from your bank (CSV) or export all your data.
